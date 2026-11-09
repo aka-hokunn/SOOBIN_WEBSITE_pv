@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cổng Đăng Nhập Quản Lý & Nhân Sự — Soobin Swimwear</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/static/vendor/lenis.css">
+  <link rel="stylesheet" href="/static/css/creative-ui.css?v=cool_v5">
+  <script src="/static/js/three.min.js"></script>
+  <script defer src="/static/js/ui.js"></script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f0f9ff;
+      color: #0f172a;
+      min-height: 100vh;
+    }
+    #loginThreeOceanCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen bg-sky-50 text-slate-900">
+
+  <header class="bg-white border-b border-sky-100 px-4 sm:px-8 h-16 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5">
+      <div class="w-10 h-10 rounded-xl bg-sky-700 flex items-center justify-center text-white shadow-sm">
+        <i data-lucide="shield-check" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <span class="text-lg font-black tracking-tight text-slate-900 block leading-none">SOOBIN SWIMWEAR</span>
+        <span class="text-[10px] font-bold tracking-widest text-sky-700 uppercase">Cổng Quản Lý & Nhân Sự</span>
+      </div>
+    </a>
+
+    <div class="flex items-center gap-2.5">
+      <a href="/login" class="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-xs font-bold text-sky-800 transition">
+        Cổng Khách Hàng
+      </a>
+      <a href="/" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold transition">
+        ← Về Cửa Hàng
+      </a>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center px-4 py-8">
+    <div class="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 bg-white rounded-3xl border border-sky-200 shadow-lg overflow-hidden">
+
+      <!-- Left Column (5 Cols) -->
+      <div class="lg:col-span-5 bg-sky-950 text-white p-7 relative overflow-hidden flex flex-col justify-between min-h-[300px]">
+        <canvas id="loginThreeOceanCanvas"></canvas>
+
+        <div class="relative z-10 space-y-3">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-[11px] font-extrabold uppercase">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+            <span>Hệ Thống Nội Bộ</span>
+          </div>
+          <h1 class="text-2xl font-extrabold text-white leading-snug">
+            Cổng Điều Hành Quản Lý, Bán Hàng POS & Kho Vận
+          </h1>
+          <p class="text-xs text-sky-100/90 leading-relaxed">
+            Dành riêng cho nhân sự nội bộ Soobin Swimwear: Quản lý cửa hàng, Thu ngân POS, Thủ kho WMS và Quản trị viên.
+          </p>
+        </div>
+
+        <div class="relative z-10 pt-4 text-xs text-sky-200">
+          Mật khẩu demo nội bộ: <strong class="text-white font-mono">Password123@</strong>
+        </div>
+      </div>
+
+      <!-- Right Column (7 Cols) -->
+      <div class="lg:col-span-7 p-6 sm:p-8 space-y-5 bg-white">
+        <div>
+          <h2 class="text-lg font-extrabold text-slate-900">Đăng Nhập Nội Bộ</h2>
+        </div>
+
+        <form onsubmit="submitStaffLogin(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Phân hệ làm việc</label>
+            <select id="portalSelect" onchange="syncDemoEmailWithPortal()" class="w-full rounded-xl px-3.5 py-2.5 text-sm font-bold border border-sky-200 bg-white text-slate-900 outline-none focus:border-sky-600">
+              <option value="MANAGER">Quản Lý Cửa Hàng (MANAGER)</option>
+              <option value="SALES">Bán Hàng & Thu Ngân POS (SALES)</option>
+              <option value="WAREHOUSE">Thủ Kho & Kiểm Kê (WAREHOUSE)</option>
+              <option value="ADMIN">Quản Trị Hệ Thống (ADMIN)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Email hoặc Số điện thoại nhân sự</label>
+            <input id="identifier" required placeholder="manager@soobin.vn"
+                   class="w-full rounded-xl px-3.5 py-2.5 text-sm border border-sky-200 bg-white text-slate-900 outline-none focus:border-sky-600" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Mật khẩu</label>
+            <input id="password" type="password" required placeholder="••••••••" value="Password123@"
+                   class="w-full rounded-xl px-3.5 py-2.5 text-sm border border-sky-200 bg-white text-slate-900 outline-none focus:border-sky-600" />
+          </div>
+
+          <button type="submit" class="w-full rounded-xl bg-sky-600 hover:bg-sky-700 py-3 text-sm font-extrabold text-white shadow-sm transition">
+            Vào Cổng Quản Trị
+          </button>
+        </form>
+
+        <!-- 4 Staff Role Quick Buttons -->
+        <div class="pt-3 border-t border-sky-100 space-y-2">
+          <span class="text-[11px] font-bold text-slate-500 block">Chọn nhanh tài khoản theo vai trò:</span>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="quickStaffLogin('MANAGER', 'manager@soobin.vn')"
+                    class="p-2.5 rounded-xl border border-sky-100 bg-sky-50/70 hover:bg-sky-100 text-left transition">
+              <strong class="text-xs font-extrabold text-slate-900 block">💼 Quản Lý (MANAGER)</strong>
+              <span class="text-[10px] font-mono text-slate-500">manager@soobin.vn</span>
+            </button>
+            <button type="button" onclick="quickStaffLogin('SALES', 'sales@soobin.vn')"
+                    class="p-2.5 rounded-xl border border-sky-100 bg-sky-50/70 hover:bg-sky-100 text-left transition">
+              <strong class="text-xs font-extrabold text-slate-900 block">🧾 Bán Hàng & POS (SALES)</strong>
+              <span class="text-[10px] font-mono text-slate-500">sales@soobin.vn</span>
+            </button>
+            <button type="button" onclick="quickStaffLogin('WAREHOUSE', 'warehouse@soobin.vn')"
+                    class="p-2.5 rounded-xl border border-sky-100 bg-sky-50/70 hover:bg-sky-100 text-left transition">
+              <strong class="text-xs font-extrabold text-slate-900 block">📦 Thủ Kho (WAREHOUSE)</strong>
+              <span class="text-[10px] font-mono text-slate-500">warehouse@soobin.vn</span>
+            </button>
+            <button type="button" onclick="quickStaffLogin('ADMIN', 'admin@soobin.vn')"
+                    class="p-2.5 rounded-xl border border-sky-100 bg-sky-50/70 hover:bg-sky-100 text-left transition">
+              <strong class="text-xs font-extrabold text-slate-900 block">🛡️ Quản Trị (ADMIN)</strong>
+              <span class="text-[10px] font-mono text-slate-500">admin@soobin.vn</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="statusBox" class="hidden rounded-xl p-3 text-xs font-bold"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/static/vendor/lenis.min.js"></script>
+  <script src="/static/vendor/gsap.min.js"></script>
+  <script src="/static/vendor/ScrollTrigger.min.js"></script>
+  <script src="/static/vendor/Flip.min.js"></script>
+  <script src="/static/vendor/split-type.min.js"></script>
+  <script src="/static/js/creative-engine.js?v=cool_v5"></script>
+  <script>
+    lucide.createIcons();
+
+    const roleTargets = {
+      ADMIN: "/admin",
+      MANAGER: "/manager",
+      WAREHOUSE: "/warehouse",
+      SALES: "/sales",
+      CUSTOMER: "/"
+    };
+
+    const demoEmailByPortal = {
+      MANAGER: "manager@soobin.vn",
+      SALES: "sales@soobin.vn",
+      WAREHOUSE: "warehouse@soobin.vn",
+      ADMIN: "admin@soobin.vn"
+    };
+
+    const path = window.location.pathname;
+    const select = document.getElementById("portalSelect");
+    if (path.startsWith("/admin")) select.value = "ADMIN";
+    else if (path.startsWith("/manager")) select.value = "MANAGER";
+    else if (path.startsWith("/warehouse")) select.value = "WAREHOUSE";
+    else if (path.startsWith("/sales")) select.value = "SALES";
+
+    function syncDemoEmailWithPortal() {
+      const p = document.getElementById("portalSelect").value;
+      document.getElementById("identifier").value = demoEmailByPortal[p] || "manager@soobin.vn";
+      if (!document.getElementById("password").value) {
+        document.getElementById("password").value = "Password123@";
+      }
+    }
+    syncDemoEmailWithPortal();
+
+    async function quickStaffLogin(portal, email) {
+      document.getElementById("portalSelect").value = portal;
+      document.getElementById("identifier").value = email;
+      document.getElementById("password").value = "Password123@";
+      await executeStaffLogin(email, "Password123@", portal);
+    }
+
+    async function submitStaffLogin(e) {
+      e.preventDefault();
+      const portal = document.getElementById("portalSelect").value;
+      const email_or_phone = document.getElementById("identifier").value.trim();
+      const password = document.getElementById("password").value;
+      await executeStaffLogin(email_or_phone, password, portal);
+    }
+
+    async function executeStaffLogin(email_or_phone, password, portal) {
+      const box = document.getElementById("statusBox");
+      try {
+        const res = await fetch("/api/v1/auth/portal-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email_or_phone, password, portal }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          box.textContent = data.detail || "Đăng nhập thất bại.";
+          box.className = "rounded-xl p-3 text-xs font-bold bg-rose-50 border border-rose-200 text-rose-700";
+          box.classList.remove("hidden");
+          return;
+        }
+        const roleCode = (data.user?.role_code || data.user?.role?.code || portal || "MANAGER").toUpperCase();
+        if (data.session_token) {
+          localStorage.setItem("session_token", data.session_token);
+        }
+        localStorage.setItem("user_role", roleCode);
+        if (data.user?.full_name) {
+          localStorage.setItem("user_name", data.user.full_name);
+        }
+        box.textContent = `Đăng nhập thành công (${roleCode})! Đang mở cổng quản trị...`;
+        box.className = "rounded-xl p-3 text-xs font-bold bg-emerald-50 border border-emerald-200 text-emerald-700";
+        box.classList.remove("hidden");
+        window.location.href = data.redirect_url || roleTargets[roleCode] || "/";
+      } catch (_) {
+        box.textContent = "Không thể kết nối máy chủ.";
+        box.className = "rounded-xl p-3 text-xs font-bold bg-rose-50 border border-rose-200 text-rose-700";
+        box.className = "rounded-xl p-3 text-xs font-bold bg-rose-50 border border-rose-200 text-rose-700";
+        box.classList.remove("hidden");
+      }
+    }
+  </script>
+</body>
+</html>

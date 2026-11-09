@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng Nhập & Đăng Ký Khách Hàng — Soobin Swimwear</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/static/vendor/lenis.css">
+  <link rel="stylesheet" href="/static/css/creative-ui.css?v=cool_v5">
+  <script src="/static/js/three.min.js"></script>
+  <script defer src="/static/js/ui.js"></script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f0f9ff;
+      color: #0f172a;
+      min-height: 100vh;
+    }
+    #loginThreeOceanCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen bg-sky-50 text-slate-900">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-sky-100 px-4 sm:px-8 h-16 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2.5">
+      <div class="w-10 h-10 rounded-xl bg-sky-600 flex items-center justify-center text-white shadow-sm">
+        <i data-lucide="waves" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <span class="text-lg font-black tracking-tight text-slate-900 block leading-none">SOOBIN SWIMWEAR</span>
+        <span class="text-[10px] font-bold tracking-widest text-sky-600 uppercase">Cổng Khách Hàng</span>
+      </div>
+    </a>
+
+    <div class="flex items-center gap-2.5">
+      <a href="/" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold transition flex items-center gap-1.5">
+        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+        <span>Về Cửa Hàng</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex items-center justify-center px-4 py-8">
+    <div class="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 bg-white rounded-3xl border border-sky-200 shadow-lg overflow-hidden">
+
+      <!-- Left Column (5 Cols): Cool Aqua Showcase -->
+      <div class="lg:col-span-5 bg-sky-900 text-white p-7 relative overflow-hidden flex flex-col justify-between min-h-[300px]">
+        <canvas id="loginThreeOceanCanvas"></canvas>
+
+        <div class="relative z-10 space-y-3">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-300/30 text-sky-200 text-[11px] font-extrabold uppercase">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <span>Thành Viên Soobin</span>
+          </div>
+
+          <h1 class="text-2xl font-extrabold leading-snug text-white">
+            Mua Sắm Đồ Bơi & Phụ Kiện Chuyên Nghiệp
+          </h1>
+
+          <p class="text-xs text-sky-100/90 leading-relaxed">
+            Tích điểm thành viên VIP, lưu sổ địa chỉ nhận hàng nhanh, theo dõi vận đơn GHTK và gửi yêu cầu đổi size/bảo hành trực tuyến.
+          </p>
+        </div>
+
+        <div class="relative z-10 space-y-2 pt-5 text-xs">
+          <div class="flex items-center gap-2 text-sky-100">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-teal-300 shrink-0"></i>
+            <span>Tự động đồng bộ giỏ hàng của bạn</span>
+          </div>
+          <div class="flex items-center gap-2 text-sky-100">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-teal-300 shrink-0"></i>
+            <span>Hỗ trợ đổi size & bảo hành nhanh chóng</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column (7 Cols): Customer Login / Register -->
+      <div class="lg:col-span-7 p-6 sm:p-8 space-y-5 bg-white">
+        <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-sky-50 border border-sky-100 text-xs font-extrabold">
+          <button type="button" id="tabBtnLogin" onclick="switchCustomerAuthMode('login')"
+                  class="py-2.5 rounded-lg bg-sky-600 text-white shadow-sm transition flex items-center justify-center gap-1.5">
+            <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+            <span>Đăng Nhập Khách Hàng</span>
+          </button>
+          <button type="button" id="tabBtnRegister" onclick="switchCustomerAuthMode('register')"
+                  class="py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+            <span>Đăng Ký Mới</span>
+          </button>
+        </div>
+
+        <!-- 1. CUSTOMER LOGIN FORM -->
+        <div id="panelLogin" class="space-y-4">
+          <form onsubmit="submitCustomerLogin(event)" class="space-y-3.5">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Email hoặc Số điện thoại Khách hàng</label>
+              <div class="relative">
+                <input id="loginIdentifier" type="text" required placeholder="customer@soobin.vn hoặc 0905000005"
+                       class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-sky-200 bg-white text-slate-900 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-500/20 outline-none">
+                <i data-lucide="mail" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="text-xs font-bold text-slate-700">Mật khẩu</label>
+                <button type="button" onclick="switchCustomerAuthMode('recovery')" class="text-[11px] font-bold text-sky-600 hover:underline">
+                  Quên mật khẩu?
+                </button>
+              </div>
+              <div class="relative">
+                <input id="loginPassword" type="password" required placeholder="••••••••"
+                       class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-sky-200 bg-white text-slate-900 text-sm focus:border-sky-600 focus:ring-2 focus:ring-sky-500/20 outline-none">
+                <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-sm shadow-sm transition flex items-center justify-center gap-2">
+              <i data-lucide="log-in" class="w-4 h-4"></i>
+              <span>Đăng Nhập Mua Sắm</span>
+            </button>
+          </form>
+
+          <!-- Customer Demo & Google Login (Strictly Customer Only) -->
+          <div class="pt-3 border-t border-sky-100 flex flex-wrap items-center justify-between gap-2">
+            <button type="button" onclick="fillDemoCustomer()"
+                    class="flex-1 py-2 px-3 rounded-xl border border-sky-200 bg-sky-50/70 hover:bg-sky-100 text-sky-900 text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <span>🏊 Điền nhanh TK Khách mẫu</span>
+            </button>
+            <button type="button" onclick="submitGoogleQuickLogin()"
+                    class="flex-1 py-2 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <span>🌐 Tiếp tục với Google</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. CUSTOMER REGISTER FORM -->
+        <div id="panelRegister" class="space-y-3.5 hidden">
+          <form onsubmit="submitCustomerRegister(event)" class="space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Họ và tên *</label>
+              <input id="regFullName" type="text" required placeholder="Nguyễn Văn A"
+                     class="w-full px-3.5 py-2.5 rounded-xl border border-sky-200 bg-white text-sm outline-none focus:border-sky-600">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Email *</label>
+                <input id="regEmail" type="email" required placeholder="you@example.com"
+                       class="w-full px-3.5 py-2.5 rounded-xl border border-sky-200 bg-white text-sm outline-none focus:border-sky-600">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Số điện thoại *</label>
+                <input id="regPhone" type="text" required placeholder="0901234567"
+                       class="w-full px-3.5 py-2.5 rounded-xl border border-sky-200 bg-white text-sm outline-none focus:border-sky-600">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Mật khẩu (tối thiểu 8 ký tự, gồm chữ và số) *</label>
+              <input id="regPassword" type="password" required minlength="8" placeholder="Password123@"
+                     class="w-full px-3.5 py-2.5 rounded-xl border border-sky-200 bg-white text-sm outline-none focus:border-sky-600">
+            </div>
+            <button type="submit" class="w-full py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-sm shadow-sm transition">
+              Đăng Ký Tài Khoản Khách Hàng
+            </button>
+          </form>
+        </div>
+
+        <!-- 3. PASSWORD RECOVERY FORM -->
+        <div id="panelRecovery" class="space-y-3.5 hidden">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-extrabold text-slate-900">Khôi Phục Mật Khẩu</h3>
+            <button type="button" onclick="switchCustomerAuthMode('login')" class="text-xs font-bold text-sky-600 hover:underline">← Quay lại</button>
+          </div>
+          <form onsubmit="requestPasswordRecovery(event)" class="space-y-2.5">
+            <input id="forgotEmail" type="email" required placeholder="Nhập email đã đăng ký"
+                   class="w-full px-3.5 py-2.5 rounded-xl border border-sky-200 bg-white text-sm outline-none focus:border-sky-600">
+            <button type="submit" class="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs transition">
+              Nhận Mã Đặt Lại Mật Khẩu
+            </button>
+          </form>
+          <form onsubmit="confirmPasswordRecovery(event)" class="space-y-2.5 pt-2 border-t border-sky-100">
+            <input id="resetTokenInput" type="text" required placeholder="Mã xác nhận khôi phục"
+                   class="w-full px-3.5 py-2.5 rounded-xl border border-sky-200 bg-white text-xs font-mono outline-none focus:border-sky-600">
+            <input id="resetNewPassword" type="password" required minlength="8" placeholder="Mật khẩu mới"
+                   class="w-full px-3.5 py-2.5 rounded-xl border border-sky-200 bg-white text-sm outline-none focus:border-sky-600">
+            <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs transition">
+              Cập Nhật Mật Khẩu Mới
+            </button>
+          </form>
+        </div>
+
+        <div id="authStatusBox" class="hidden rounded-xl p-3 text-xs font-bold"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/static/vendor/lenis.min.js"></script>
+  <script src="/static/vendor/gsap.min.js"></script>
+  <script src="/static/vendor/ScrollTrigger.min.js"></script>
+  <script src="/static/vendor/Flip.min.js"></script>
+  <script src="/static/vendor/split-type.min.js"></script>
+  <script src="/static/js/creative-engine.js?v=cool_v5"></script>
+  <script>
+    lucide.createIcons();
+
+    function showAuthStatus(message, isError = false) {
+      const box = document.getElementById("authStatusBox");
+      box.innerHTML = message;
+      box.className = `rounded-xl p-3 text-xs font-bold border ${
+        isError
+          ? "bg-rose-50 border-rose-200 text-rose-700"
+          : "bg-emerald-50 border-emerald-200 text-emerald-700"
+      }`;
+      box.classList.remove("hidden");
+      if (window.notify) window.notify(message.replace(/<[^>]+>/g, ""), isError ? "error" : "success");
+    }
+
+    function switchCustomerAuthMode(mode) {
+      const pLogin = document.getElementById("panelLogin");
+      const pReg = document.getElementById("panelRegister");
+      const pRec = document.getElementById("panelRecovery");
+      const bLogin = document.getElementById("tabBtnLogin");
+      const bReg = document.getElementById("tabBtnRegister");
+
+      [pLogin, pReg, pRec].forEach((el) => el.classList.add("hidden"));
+      const target = mode === "register" ? pReg : mode === "recovery" ? pRec : pLogin;
+      target.classList.remove("hidden");
+
+      if (mode === "register") {
+        bReg.className = "py-2.5 rounded-lg bg-sky-600 text-white shadow-sm transition flex items-center justify-center gap-1.5";
+        bLogin.className = "py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5";
+      } else {
+        bLogin.className = "py-2.5 rounded-lg bg-sky-600 text-white shadow-sm transition flex items-center justify-center gap-1.5";
+        bReg.className = "py-2.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5";
+      }
+    }
+
+    async function syncGuestCartOnLogin(token) {
+      try {
+        const guestCart = JSON.parse(localStorage.getItem("soobin_guest_cart") || "[]");
+        if (guestCart.length > 0) {
+          await fetch("/api/v1/cart/merge", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { "Authorization": `Bearer ${token}` } : {})
+            },
+            body: JSON.stringify({ items: guestCart }),
+          });
+          localStorage.removeItem("soobin_guest_cart");
+        }
+      } catch (_) {}
+    }
+
+    function persistCustomerSession(data) {
+      if (data.session_token) {
+        localStorage.setItem("customer_session_token", data.session_token);
+        localStorage.setItem("session_token", data.session_token);
+      }
+      localStorage.setItem("user_role", "CUSTOMER");
+      if (data.user?.full_name) {
+        localStorage.setItem("user_name", data.user.full_name);
+      }
+    }
+
+    async function fillDemoCustomer() {
+      document.getElementById("loginIdentifier").value = "customer@soobin.vn";
+      document.getElementById("loginPassword").value = "Password123@";
+      await performCustomerLogin("customer@soobin.vn", "Password123@");
+    }
+
+    async function submitCustomerLogin(e) {
+      e.preventDefault();
+      const email_or_phone = document.getElementById("loginIdentifier").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      await performCustomerLogin(email_or_phone, password);
+    }
+
+    async function performCustomerLogin(email_or_phone, password) {
+      try {
+        const res = await fetch("/api/v1/auth/portal-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email_or_phone, password, portal: "CUSTOMER" }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showAuthStatus(data.detail || "Đăng nhập thất bại.", true);
+          return;
+        }
+        persistCustomerSession(data);
+        await syncGuestCartOnLogin(data.session_token);
+        showAuthStatus("Đăng nhập thành công! Đang quay lại cửa hàng...");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 250);
+      } catch (_) {
+        showAuthStatus("Không thể kết nối máy chủ.", true);
+      }
+    }
+
+    async function submitCustomerRegister(e) {
+      e.preventDefault();
+      const payload = {
+        full_name: document.getElementById("regFullName").value.trim(),
+        email: document.getElementById("regEmail").value.trim(),
+        phone: document.getElementById("regPhone").value.trim(),
+        password: document.getElementById("regPassword").value,
+      };
+      try {
+        const res = await fetch("/api/v1/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showAuthStatus(data.detail || "Đăng ký thất bại.", true);
+          return;
+        }
+        if (data.verification_token) {
+          await fetch("/api/v1/auth/verify-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token: data.verification_token }),
+          });
+        }
+        await performCustomerLogin(payload.email, payload.password);
+      } catch (_) {
+        showAuthStatus("Không thể kết nối máy chủ.", true);
+      }
+    }
+
+    async function submitGoogleQuickLogin() {
+      const email = prompt("Nhập email Google của bạn:", "google.swimmer@soobin.vn");
+      if (!email) return;
+      const full_name = email.split("@")[0].replace(/[._]/g, " ");
+      const res = await fetch("/api/v1/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          full_name: full_name.charAt(0).toUpperCase() + full_name.slice(1),
+          provider_subject: "google-" + email,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showAuthStatus(data.detail || "Đăng nhập Google thất bại.", true);
+        return;
+      }
+      persistCustomerSession(data);
+      await syncGuestCartOnLogin(data.session_token);
+      window.location.href = "/";
+    }
+
+    async function requestPasswordRecovery(e) {
+      e.preventDefault();
+      const email = document.getElementById("forgotEmail").value.trim();
+      const res = await fetch("/api/v1/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showAuthStatus(data.detail || "Không thể tạo yêu cầu.", true);
+        return;
+      }
+      if (data.reset_token) {
+        document.getElementById("resetTokenInput").value = data.reset_token;
+      }
+      showAuthStatus(data.message || "Đã tạo mã khôi phục mật khẩu.");
+    }
+
+    async function confirmPasswordRecovery(e) {
+      e.preventDefault();
+      const token = document.getElementById("resetTokenInput").value.trim();
+      const new_password = document.getElementById("resetNewPassword").value;
+      const res = await fetch("/api/v1/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, new_password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showAuthStatus(data.detail || "Không thể đặt lại mật khẩu.", true);
+        return;
+      }
+      showAuthStatus("Đặt lại mật khẩu thành công! Vui lòng đăng nhập.");
+      switchCustomerAuthMode("login");
+    }
+  </script>
+</body>
+</html>

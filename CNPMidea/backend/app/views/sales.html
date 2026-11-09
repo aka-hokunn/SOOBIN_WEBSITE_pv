@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soobin Swimwear — Cổng Bán Hàng POS, Clienteling CRM & Vận Đơn (SALES)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/static/vendor/lenis.css">
+  <link rel="stylesheet" href="/static/css/creative-ui.css">
+  <script defer src="/static/js/ui.js"></script>
+  <script defer src="/static/js/live-sync.js"></script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .morph-entering {
+      animation: salesMorphIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes salesMorphIn {
+      0% { opacity: 0; transform: perspective(1100px) translateY(18px) rotateX(5deg) scale(0.98); }
+      100% { opacity: 1; transform: perspective(1100px) translateY(0) rotateX(0deg) scale(1); }
+    }
+    .tilt-card-3d {
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+      transform-style: preserve-3d;
+    }
+  </style>
+</head>
+<body class="aquatic-role-body text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Access Denied Modal -->
+  <div id="accessDeniedModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white border border-rose-300 rounded-2xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl">
+      <div class="w-14 h-14 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto">
+        <i data-lucide="shield-alert" class="w-8 h-8"></i>
+      </div>
+      <h3 class="text-lg font-extrabold text-slate-900">Quyền Truy Cập Bị Từ Chối!</h3>
+      <p id="accessDeniedMsg" class="text-xs text-slate-600 leading-relaxed"></p>
+      <button onclick="handleLogout()" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-lg transition">
+        Đăng Xuất & Chuyển Cổng Phù Hợp
+      </button>
+    </div>
+  </div>
+
+  <!-- POS Receipt / Electronic Invoice Modal -->
+  <div id="posInvoiceModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-sky-200 morph-entering max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div>
+          <span class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">Hóa Đơn Thu Ngân POS</span>
+          <h3 class="font-extrabold text-base text-slate-900 mt-1">Phiếu Thanh Toán & Hóa Đơn Quầy POS</h3>
+        </div>
+        <button onclick="closePosInvoiceModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
+      </div>
+      <div id="posInvoiceContent" class="text-xs space-y-2.5"></div>
+      <div class="flex justify-end gap-2 pt-3 border-t">
+        <button onclick="closePosInvoiceModal()" class="px-4 py-2 rounded-xl border text-xs font-bold text-slate-600">Đóng</button>
+        <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs flex items-center gap-1.5">
+          <i data-lucide="printer" class="w-3.5 h-3.5"></i> In Hóa Đơn Nhiệt K80
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Aquatic Ocean Header -->
+  <header class="aquatic-ocean-header text-white sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-sky-600 flex items-center justify-center text-white shadow-sm">
+          <i data-lucide="waves" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="font-black text-base tracking-tight text-white">SOOBIN <span class="text-sky-400">POS & SALES</span></span>
+          <span class="text-[10px] block text-slate-300 font-semibold uppercase tracking-wider">Quầy Thu Ngân Đồ Bơi, Chăm Sóc Khách Hàng & Vận Đơn</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex items-center gap-1.5">
+        <button onclick="switchTab('queue')" id="btnTabQueue" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-sky-600 text-white transition flex items-center gap-1.5">
+          <i data-lucide="clock" class="w-4 h-4"></i> Đơn Chờ Duyệt
+        </button>
+        <button onclick="switchTab('pos')" id="btnTabPos" class="px-3 py-1.5 text-xs font-bold rounded-lg hover:bg-sky-900 text-sky-200 transition flex items-center gap-1.5">
+          <i data-lucide="calculator" class="w-4 h-4"></i> Quầy Thu Ngân POS
+        </button>
+        <button onclick="switchTab('crm')" id="btnTabCrm" class="px-3 py-1.5 text-xs font-bold rounded-lg hover:bg-sky-900 text-sky-200 transition flex items-center gap-1.5">
+          <i data-lucide="crown" class="w-4 h-4"></i> Khách Hàng VIP
+        </button>
+        <button onclick="switchTab('feedbacks')" id="btnTabFeedbacks" class="px-3 py-1.5 text-xs font-bold rounded-lg hover:bg-sky-900 text-sky-200 transition flex items-center gap-1.5">
+          <i data-lucide="shield-check" class="w-4 h-4"></i> Bảo Hành & Đổi Size
+        </button>
+        <button onclick="switchTab('shipments')" id="btnTabShipments" class="px-3 py-1.5 text-xs font-bold rounded-lg hover:bg-sky-900 text-sky-200 transition flex items-center gap-1.5">
+          <i data-lucide="truck" class="w-4 h-4"></i> Vận Đơn GHTK
+        </button>
+        <button onclick="switchTab('consult')" id="btnTabConsult" class="px-3 py-1.5 text-xs font-bold rounded-lg hover:bg-sky-900 text-sky-200 transition flex items-center gap-1.5">
+          <i data-lucide="search" class="w-4 h-4"></i> Tra Cứu Tồn Size
+        </button>
+      </nav>
+
+      <!-- User & Logout -->
+      <div class="flex items-center gap-3">
+        <a href="http://localhost:8001/" target="_blank" rel="noopener" class="hidden xl:inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-950/70 px-2.5 py-1.5 text-xs font-bold text-emerald-200 transition hover:bg-emerald-900">
+          <i data-lucide="external-link" class="h-3.5 w-3.5"></i> Cổng GHTK
+        </a>
+        <div class="text-right hidden sm:block">
+          <span id="userNameLabel" class="text-xs font-bold text-white block">Nhân Viên Sales</span>
+          <span class="text-[10px] text-cyan-300 font-semibold">Bán Hàng & Thu Ngân (SALES)</span>
+        </div>
+        <button onclick="handleLogout()" class="px-3 py-1.5 text-xs font-bold bg-rose-900/60 hover:bg-rose-900 text-rose-200 rounded-lg flex items-center gap-1.5 transition">
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Đăng Xuất
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- Top Quick KPI Strip -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="tilt-card-3d bg-white p-4 rounded-2xl border border-sky-100 shadow-sm flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold uppercase text-slate-400">Đơn Chờ Duyệt</span>
+          <div id="salesKpiPending" class="text-xl font-extrabold text-amber-600">0 đơn</div>
+        </div>
+        <span class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="inbox" class="w-5 h-5"></i></span>
+      </div>
+      <div class="tilt-card-3d bg-white p-4 rounded-2xl border border-sky-100 shadow-sm flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold uppercase text-slate-400">Vận Đơn GHTK Đang Giao</span>
+          <div id="salesKpiShipping" class="text-xl font-extrabold text-sky-600">0 vận đơn</div>
+        </div>
+        <span class="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center"><i data-lucide="truck" class="w-5 h-5"></i></span>
+      </div>
+      <div class="tilt-card-3d bg-white p-4 rounded-2xl border border-sky-100 shadow-sm flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold uppercase text-slate-400">Khách Hàng Thân Thiết</span>
+          <div id="salesKpiVipCount" class="text-xl font-extrabold text-cyan-600">0 hồ sơ</div>
+        </div>
+        <span class="w-10 h-10 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center"><i data-lucide="crown" class="w-5 h-5"></i></span>
+      </div>
+      <div class="tilt-card-3d bg-white p-4 rounded-2xl border border-sky-100 shadow-sm flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold uppercase text-slate-400">Phiếu Tư Vấn Chờ Xử Lý</span>
+          <div id="salesKpiFeedbackCount" class="text-xl font-extrabold text-emerald-600">0 phiếu</div>
+        </div>
+        <span class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="message-circle-heart" class="w-5 h-5"></i></span>
+      </div>
+    </div>
+
+    <!-- 1. QUEUE TAB -->
+    <div id="tabContentQueue" class="space-y-4 morph-entering">
+      <div class="bg-white p-5 rounded-2xl border border-sky-100 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        <div>
+          <h2 class="font-extrabold text-lg text-slate-900 flex items-center gap-2">
+            <i data-lucide="inbox" class="w-5 h-5 text-sky-600"></i> Hàng Đợi Xử Lý Đơn Hàng & Điều Phối GHTK
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">Xác nhận thanh toán chuyển khoản, duyệt đẩy đơn sang GHTK tự động hoặc duyệt hàng loạt 1-Click</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+          <input type="text" id="salesOrderSearchInput" oninput="renderSalesOrdersTable()" placeholder="Tìm mã đơn, tên KH, SĐT..."
+            class="text-xs border border-sky-200 rounded-xl px-3 py-1.5 bg-sky-50/40 w-full sm:w-52 outline-none focus:ring-2 focus:ring-sky-500" />
+          <select id="salesOrderStatusFilter" onchange="renderSalesOrdersTable()" class="text-xs border border-sky-200 rounded-xl px-2.5 py-1.5 bg-white font-bold text-sky-900 outline-none">
+            <option value="Chưa xử lý">Đơn Chờ Duyệt (Chưa xử lý)</option>
+            <option value="ALL">Tất cả đơn hàng</option>
+            <option value="Đã xử lý">Đã xử lý</option>
+            <option value="Đang vận chuyển">Đang vận chuyển</option>
+            <option value="Đã giao">Đã giao thành công</option>
+            <option value="Chờ hoàn tiền">Chờ hoàn tiền</option>
+            <option value="Đã hủy">Đã hủy</option>
+          </select>
+          <button onclick="bulkConfirmEligibleSalesOrders()" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-extrabold rounded-xl shadow-sm transition flex items-center gap-1.5">
+            <i data-lucide="zap" class="w-3.5 h-3.5"></i> Duyệt Hàng Loạt Đơn Đủ ĐK
+          </button>
+          <button onclick="switchTab('pos')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+            <i data-lucide="calculator" class="w-3.5 h-3.5"></i> Mở Quầy POS
+          </button>
+          <button onclick="loadSalesOrders()" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Làm Mới
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-sky-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-sky-50 text-sky-900 font-bold border-b border-sky-100 uppercase">
+              <tr>
+                <th class="p-3">Mã Đơn</th>
+                <th class="p-3">Người Nhận & SĐT</th>
+                <th class="p-3">Địa Chỉ Giao Hàng</th>
+                <th class="p-3">Phương Thức</th>
+                <th class="p-3">Tổng Tiền</th>
+                <th class="p-3">Thanh Toán</th>
+                <th class="p-3 text-right">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="salesOrdersTableBody" class="divide-y divide-sky-50"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. UPGRADED IN-STORE POS CHECKOUT & PAYMENT TERMINAL TAB -->
+    <div id="tabContentPos" class="hidden space-y-4">
+      <!-- Practical POS Shift Summary Bar -->
+      <div class="bg-white p-4 rounded-2xl border border-sky-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-extrabold">
+            <i data-lucide="wallet" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm text-slate-900">Tổng Kết Ca Thu Ngân POS</h3>
+            <span class="text-[11px] text-slate-500">Đối soát tiền mặt tại két & chuyển khoản VietQR theo thời gian thực</span>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 text-xs">
+          <div class="px-3 py-1.5 rounded-xl bg-sky-50 border border-sky-100">
+            <span class="text-slate-500">Đơn POS:</span>
+            <strong id="posShiftCount" class="ml-1 font-extrabold text-sky-800">0 đơn</strong>
+          </div>
+          <div class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-100">
+            <span class="text-slate-500">Tiền mặt:</span>
+            <strong id="posShiftCash" class="ml-1 font-mono font-extrabold text-emerald-700">0 ₫</strong>
+          </div>
+          <div class="px-3 py-1.5 rounded-xl bg-cyan-50 border border-cyan-100">
+            <span class="text-slate-500">VietQR/CK:</span>
+            <strong id="posShiftVietqr" class="ml-1 font-mono font-extrabold text-cyan-800">0 ₫</strong>
+          </div>
+          <div class="px-3.5 py-1.5 rounded-xl bg-sky-700 text-white">
+            <span class="text-sky-200">Tổng thu ca:</span>
+            <strong id="posShiftTotal" class="ml-1 font-mono font-black">0 ₫</strong>
+          </div>
+          <button type="button" onclick="loadPosShiftSummary()" class="px-2.5 py-1.5 rounded-xl border border-sky-200 hover:bg-sky-50 text-sky-700 font-bold">
+            Làm mới ca
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Left (7 Cols): Visual Swimwear & Gear POS Picker -->
+        <div class="lg:col-span-7 bg-white p-5 rounded-3xl border border-sky-100 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-widest text-sky-700 bg-sky-50 px-2.5 py-0.5 rounded-full">🏊 Quầy Thu Ngân Đồ Bơi & Phụ Kiện</span>
+              <h3 class="font-extrabold text-base text-slate-900 mt-1">Chọn Sản Phẩm Vào Hóa Đơn POS</h3>
+            </div>
+            <div class="relative w-full sm:w-64">
+              <input type="text" id="posSearchInput" oninput="renderPosCatalogPicker()" placeholder="Quét mã SKU, tên đồ bơi, size..."
+                class="text-xs border border-sky-200 rounded-xl pl-8 pr-3 py-2 bg-sky-50/40 w-full outline-none focus:ring-2 focus:ring-sky-500 font-semibold" />
+              <i data-lucide="search" class="w-3.5 h-3.5 text-sky-500 absolute left-2.5 top-2.5"></i>
+            </div>
+          </div>
+
+          <!-- Quick Category Filter Pills for POS Cashier -->
+          <div class="flex flex-wrap gap-1.5 text-[11px] font-extrabold">
+            <button type="button" onclick="setPosCategoryFilter('')" id="posCatBtn-all" class="px-3 py-1.5 rounded-xl bg-sky-600 text-white shadow-sm transition">Tất cả</button>
+            <button type="button" onclick="setPosCategoryFilter('Bikini')" id="posCatBtn-Bikini" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-sky-50 transition">Bikini & Nữ</button>
+            <button type="button" onclick="setPosCategoryFilter('Áo tắm')" id="posCatBtn-Áo tắm" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-sky-50 transition">Áo Tắm 1 Mảnh</button>
+            <button type="button" onclick="setPosCategoryFilter('Quần bơi')" id="posCatBtn-Quần bơi" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-sky-50 transition">Quần Bơi Nam</button>
+            <button type="button" onclick="setPosCategoryFilter('Kính')" id="posCatBtn-Kính" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-sky-50 transition">Kính & Mũ Bơi</button>
+            <button type="button" onclick="setPosCategoryFilter('Túi')" id="posCatBtn-Túi" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-sky-50 transition">Chân Vịt & Dụng Cụ</button>
+            <button type="button" onclick="setPosCategoryFilter('SALE')" id="posCatBtn-SALE" class="px-3 py-1.5 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 transition">🔥 Đang Sale</button>
+          </div>
+
+          <div id="posVariantGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[560px] overflow-y-auto pr-1"></div>
+        </div>
+
+        <!-- Right (5 Cols): Live POS Cash Register, Customer Lookup & Multi-Method Payment -->
+        <form onsubmit="submitPosOrder(event)" class="lg:col-span-5 bg-white p-5 rounded-3xl border-2 border-sky-200 shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2">
+              <i data-lucide="receipt" class="w-5 h-5 text-sky-600"></i> Thanh Toán Tại Quầy POS
+            </h3>
+            <div class="flex items-center gap-2">
+              <span id="posTotalQty" class="px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 text-[11px] font-extrabold">0 sản phẩm</span>
+              <button type="button" onclick="clearPosCart()" class="text-[11px] font-bold text-rose-600 hover:underline">Làm mới</button>
+            </div>
+          </div>
+
+          <!-- POS Cart Items List with Unit Price & Line Total -->
+          <div id="posCartItemsList" class="space-y-2 max-h-52 overflow-y-auto pr-1 text-xs"></div>
+
+          <!-- Customer Lookup & Fulfillment Info -->
+          <div class="bg-sky-50/60 p-3.5 rounded-2xl border border-sky-100 space-y-2.5 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-sky-900 uppercase text-[10px] tracking-wider">👤 Thông tin khách mua tại quầy</span>
+              <span id="posVipTierBadge" class="hidden px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-extrabold text-[10px]"></span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Số điện thoại KH (*)</label>
+                <div class="flex gap-1">
+                  <input id="posCustomerPhone" required placeholder="0909123456" oninput="lookupPosCustomerByPhone(this.value)"
+                         class="w-full p-2 border rounded-xl bg-white font-mono font-bold outline-none focus:ring-2 focus:ring-sky-500" />
+                  <button type="button" onclick="fillWalkInGuestPos()" title="Khách lẻ vãng lai" class="px-2 py-1 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-[10px] shrink-0">Khách lẻ</button>
+                </div>
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Họ tên khách hàng (*)</label>
+                <input id="posCustomerName" required placeholder="Nguyễn Minh Anh"
+                       class="w-full p-2 border rounded-xl bg-white font-semibold outline-none focus:ring-2 focus:ring-sky-500" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="font-bold text-slate-700">Hình thức nhận hàng
+                <select id="posFulfillmentType" onchange="togglePosAddressRequirement(); updatePosLivePricing();" class="mt-1 w-full p-2 border rounded-xl bg-white font-extrabold text-sky-900">
+                  <option value="INSTORE_PICKUP">Nhận ngay tại quầy (0đ ship)</option>
+                  <option value="DELIVERY">Giao tận nơi GHTK (+30.000đ)</option>
+                </select>
+              </label>
+              <label class="font-bold text-slate-700">Mã Voucher giảm giá
+                <input id="posVoucherCode" oninput="updatePosLivePricing()" placeholder="VD: SOOBIN15" class="mt-1 w-full p-2 border rounded-xl bg-white uppercase font-mono font-bold" />
+              </label>
+            </div>
+            <!-- Quick Active Vouchers Strip -->
+            <div id="posActiveVouchersStrip" class="flex flex-wrap items-center gap-1 pt-0.5">
+              <span class="text-[10px] font-bold text-slate-500">Áp nhanh:</span>
+              <button type="button" onclick="applyQuickPosVoucher('SOOBIN15')" class="px-2 py-0.5 rounded-lg bg-white border border-sky-200 hover:bg-sky-100 text-sky-700 font-mono font-bold text-[10px]">SOOBIN15 (-15%)</button>
+              <button type="button" onclick="applyQuickPosVoucher('SUMMER20')" class="px-2 py-0.5 rounded-lg bg-white border border-sky-200 hover:bg-sky-100 text-sky-700 font-mono font-bold text-[10px]">SUMMER20 (-20%)</button>
+              <button type="button" onclick="applyQuickPosVoucher('SWIM50K')" class="px-2 py-0.5 rounded-lg bg-white border border-sky-200 hover:bg-sky-100 text-sky-700 font-mono font-bold text-[10px]">SWIM50K (-50K)</button>
+              <button type="button" onclick="applyQuickPosVoucher('')" class="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[10px]">Bỏ mã</button>
+            </div>
+
+            <label class="font-bold text-slate-700 block">Địa chỉ nhận / Ghi chú đơn POS
+              <input id="posShippingAddress" value="Nhận trực tiếp tại Showroom Soobin Swimwear" class="mt-1 w-full p-2 border rounded-xl bg-white" />
+            </label>
+          </div>
+
+          <!-- Live POS Pricing Summary Calculator -->
+          <div id="posLiveCalculatorBox" class="bg-slate-900 text-white p-4 rounded-2xl space-y-2 text-xs shadow-inner">
+            <div class="flex justify-between text-slate-300">
+              <span>Tạm tính tiền hàng:</span>
+              <strong id="posCalcSubtotal" class="font-mono">0 ₫</strong>
+            </div>
+            <div class="flex justify-between text-emerald-400">
+              <span id="posCalcDiscountLabel">Chiết khấu ưu đãi tốt nhất:</span>
+              <strong id="posCalcDiscount" class="font-mono">-0 ₫</strong>
+            </div>
+            <div class="flex justify-between text-slate-300">
+              <span>Phí giao hàng:</span>
+              <strong id="posCalcShipping" class="font-mono">0 ₫</strong>
+            </div>
+            <div class="flex justify-between items-baseline pt-2 border-t border-slate-700">
+              <span class="font-extrabold uppercase tracking-wider text-cyan-300 text-[11px]">TỔNG PHẢI THU KHÁCH:</span>
+              <strong id="posCalcGrandTotal" class="text-xl font-black text-amber-300 font-mono">0 ₫</strong>
+            </div>
+          </div>
+
+          <!-- Upgraded Multi-Method Payment Terminal -->
+          <div class="space-y-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-xs">
+            <label class="font-extrabold text-slate-800 uppercase tracking-wider text-[11px] block">💳 Phương thức thanh toán tại quầy</label>
+            <select id="posPaymentMethod" onchange="onPosPaymentMethodChange()" class="w-full p-2.5 border border-sky-300 rounded-xl bg-white font-extrabold text-sky-900 outline-none focus:ring-2 focus:ring-sky-500">
+              <option value="CASH">💵 Tiền mặt tại quầy (Tính tiền thừa tự động)</option>
+              <option value="VIETQR">🏦 Chuyển khoản VietQR tại quầy (Hiện mã QR ngay)</option>
+              <option value="COD">💳 Quẹt thẻ POS / Thu hộ COD</option>
+            </select>
+
+            <!-- A. Cash Tendered & Change Calculator Panel -->
+            <div id="posCashCalculatorPanel" class="space-y-2 pt-1">
+              <div class="flex items-center justify-between gap-2">
+                <label class="font-bold text-slate-700">Tiền khách đưa (VNĐ):</label>
+                <input type="number" id="posCashTenderedInput" min="0" step="1000" oninput="calculatePosCashChange()" placeholder="Nhập số tiền khách đưa..."
+                       class="w-44 p-2 border border-emerald-300 rounded-xl bg-white font-mono font-extrabold text-right text-emerald-700 outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+              <div class="flex flex-wrap gap-1">
+                <button type="button" onclick="setPosQuickCash('EXACT')" class="px-2 py-1 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold text-[10px]">Đúng số tiền</button>
+                <button type="button" onclick="setPosQuickCash(200000)" class="px-2 py-1 rounded-lg bg-white border hover:bg-slate-100 font-mono font-bold text-[10px]">200.000đ</button>
+                <button type="button" onclick="setPosQuickCash(500000)" class="px-2 py-1 rounded-lg bg-white border hover:bg-slate-100 font-mono font-bold text-[10px]">500.000đ</button>
+                <button type="button" onclick="setPosQuickCash(1000000)" class="px-2 py-1 rounded-lg bg-white border hover:bg-slate-100 font-mono font-bold text-[10px]">1.000.000đ</button>
+                <button type="button" onclick="setPosQuickCash(2000000)" class="px-2 py-1 rounded-lg bg-white border hover:bg-slate-100 font-mono font-bold text-[10px]">2.000.000đ</button>
+                <button type="button" onclick="setPosQuickCash(5000000)" class="px-2 py-1 rounded-lg bg-white border hover:bg-slate-100 font-mono font-bold text-[10px]">5.000.000đ</button>
+              </div>
+              <div class="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50 border border-emerald-200">
+                <span class="font-extrabold text-emerald-900">💰 Tiền thừa trả lại khách:</span>
+                <strong id="posChangeDueText" class="text-sm font-black font-mono text-emerald-700">0 ₫</strong>
+              </div>
+            </div>
+
+            <!-- B. Live VietQR Counter Preview Panel -->
+            <div id="posVietqrPreviewPanel" class="hidden pt-1">
+              <div class="p-3 rounded-xl bg-white border border-sky-200 flex items-center gap-3">
+                <img id="posLiveQrImg" src="" alt="VietQR POS" class="w-24 h-24 rounded-lg border p-1 object-contain bg-white shrink-0" />
+                <div class="space-y-1 text-[11px]">
+                  <span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-extrabold text-[10px]">Mã QR Động Theo Giỏ POS</span>
+                  <div class="font-bold text-slate-900" id="posLiveBankName">MB Bank • 0389998888</div>
+                  <div class="text-slate-500" id="posLiveAccountHolder">SOOBIN SWIMWEAR</div>
+                  <div class="text-rose-600 font-extrabold" id="posLiveQrAmountText">0 ₫</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3.5 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white font-black text-xs uppercase tracking-wider shadow-md flex items-center justify-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+            <span>Chốt Đơn Thu Ngân & In Hóa Đơn POS</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 3. 360 CLIENTELING CRM TAB -->
+    <div id="tabContentCrm" class="hidden space-y-4">
+      <div class="bg-white p-5 rounded-2xl border border-sky-100 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2">
+            <i data-lucide="crown" class="w-5 h-5 text-amber-500"></i> Hồ Sơ Khách Hàng 360° & Hạng Thẻ VIP (Clienteling CRM)
+          </h3>
+          <p class="text-xs text-slate-500 mt-1">Theo dõi tổng chi tiêu tích lũy, hạng thẻ thành viên, size thường mặc và tạo đơn nhanh cho khách VIP.</p>
+        </div>
+        <input type="text" id="crmSearchInput" oninput="loadCrmCustomers()" placeholder="Tìm theo tên, SĐT, email khách..."
+          class="text-xs border rounded-xl px-3.5 py-2 w-full sm:w-72 bg-slate-50 outline-none focus:ring-2 focus:ring-sky-500" />
+      </div>
+
+      <div id="crmCustomersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
+
+    <!-- 4. RMA (WARRANTY / EXCHANGE / RETURN) & STYLIST CONCIERGE TAB -->
+    <div id="tabContentFeedbacks" class="hidden space-y-6">
+      <!-- Bảng 1: Tiếp Nhận Yêu Cầu Bảo Hành / Đổi Size / Trả Hàng Về Đơn Hàng (Tuyến 1: SALES) -->
+      <div class="bg-white rounded-2xl border border-sky-200 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-sky-100 bg-sky-50/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-sky-100 text-sky-800">Tuyến 1 • Nhân Viên Bán Hàng Tiếp Nhận Đầu Tiên</span>
+            <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2 mt-1">
+              <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i> Yêu Cầu Bảo Hành / Đổi Size / Phản Hồi Đơn Hàng Từ Khách (RMA)
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Khi khách gửi yêu cầu bảo hành hoặc đổi size trên website, nhân viên Sales tiếp nhận đầu tiên để liên hệ xác minh và phối hợp cùng Quản lý (MANAGER) & Kho (WAREHOUSE).</p>
+          </div>
+          <button onclick="loadSalesRmaRequests()" class="px-3 py-1.5 bg-sky-600 text-white text-xs font-bold rounded-lg">Làm mới RMA</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-sky-50 text-sky-900 font-bold border-b border-sky-100 uppercase">
+              <tr>
+                <th class="p-3">Mã Phiếu / Đơn</th>
+                <th class="p-3">Khách Hàng</th>
+                <th class="p-3">Loại Yêu Cầu & Thời Hạn</th>
+                <th class="p-3">Lý Do / Size Muốn Đổi</th>
+                <th class="p-3">Trạng Thái</th>
+                <th class="p-3 text-right">Xử Lý Tuyến Sales</th>
+              </tr>
+            </thead>
+            <tbody id="salesRmaTableBody" class="divide-y divide-sky-50"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Bảng 2: Yêu Cầu Tư Vấn Stylist & CSKH -->
+      <div class="bg-white p-5 rounded-2xl border border-sky-100 shadow-sm flex items-center justify-between">
+        <div>
+          <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-5 h-5 text-sky-600"></i> Hộp Thư Tư Vấn Stylist & Phản Hồi Khách Hàng
+          </h3>
+          <p class="text-xs text-slate-500 mt-1">Danh sách các phiếu đặt lịch tư vấn chọn size, phối đồ đi biển và phản hồi trực tiếp từ Storefront 3D.</p>
+        </div>
+        <button onclick="loadStylistFeedbacks()" class="px-3 py-1.5 bg-sky-600 text-white text-xs font-bold rounded-lg">Làm mới</button>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-sky-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-sky-50 text-sky-900 font-bold border-b border-sky-100 uppercase">
+              <tr>
+                <th class="p-3">Mã Phiếu</th>
+                <th class="p-3">Khách Hàng & Liên Hệ</th>
+                <th class="p-3">Chủ Đề Tư Vấn / Bảo Hành</th>
+                <th class="p-3">Nội Dung Yêu Cầu</th>
+                <th class="p-3">Thời Gian</th>
+                <th class="p-3">Trạng Thái</th>
+                <th class="p-3 text-right">Xử Lý CSKH</th>
+              </tr>
+            </thead>
+            <tbody id="stylistFeedbacksTableBody" class="divide-y divide-sky-50"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. SHIPMENTS TAB -->
+    <div id="tabContentShipments" class="hidden space-y-4">
+      <div class="bg-white p-4 rounded-2xl border border-sky-100 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div>
+          <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2">
+            <i data-lucide="truck" class="w-5 h-5 text-sky-600"></i> Điều Phối & Cập Nhật Trạng Thái Vận Đơn GHTK
+          </h3>
+          <p class="text-xs text-slate-500 mt-1">Cập nhật trực tiếp lộ trình giao hàng GHTK (Đang giao, Đã giao xuất Hóa đơn điện tử, hoặc Giao thất bại hoàn kho)</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <input type="text" id="salesShipmentSearchInput" oninput="renderSalesShipmentsTable()" placeholder="Tìm mã vận đơn, mã đơn, tên KH..."
+            class="text-xs border border-sky-200 rounded-xl px-3 py-1.5 bg-sky-50/40 w-56 outline-none focus:ring-2 focus:ring-sky-500" />
+          <select id="salesShipmentStatusFilter" onchange="renderSalesShipmentsTable()" class="text-xs border border-sky-200 rounded-xl px-2.5 py-1.5 bg-white font-bold text-sky-900 outline-none">
+            <option value="ALL">Tất cả vận đơn</option>
+            <option value="ACTIVE">Đang vận chuyển / Đã lấy hàng</option>
+            <option value="DELIVERED">Đã giao thành công</option>
+            <option value="FAILED">Giao thất bại / Hoàn hàng</option>
+          </select>
+          <button onclick="bulkDeliverActiveShipments()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold rounded-xl shadow-sm transition flex items-center gap-1.5">
+            <i data-lucide="check-check" class="w-3.5 h-3.5"></i> Giao Thành Công Tất Cả Đang Giao
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-sky-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-sky-50 text-sky-900 font-bold border-b border-sky-100 uppercase">
+              <tr>
+                <th class="p-3">Mã Vận Đơn</th>
+                <th class="p-3">Mã Đơn Hàng</th>
+                <th class="p-3">Khách Hàng</th>
+                <th class="p-3">Đơn Vị VC</th>
+                <th class="p-3">Cước Phí</th>
+                <th class="p-3">Trạng Thái Giao Hàng</th>
+                <th class="p-3 text-right">Cập Nhật Lộ Trình GHTK</th>
+              </tr>
+            </thead>
+            <tbody id="salesShipmentsTableBody" class="divide-y divide-sky-50"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. CONSULT TAB (Quick Stock Lookup) -->
+    <div id="tabContentConsult" class="hidden space-y-4">
+      <div class="bg-white p-5 rounded-2xl border border-sky-100 shadow-sm space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2">
+            <i data-lucide="message-square" class="w-5 h-5 text-sky-600"></i> Tra Cứu Tồn Kho & Tư Vấn Bảng Size (248 Biến Thể)
+          </h3>
+          <span id="consultMatchCountBadge" class="px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 font-extrabold text-xs">Đang hiển thị toàn bộ</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
+          <input type="text" id="consultSearchInput" oninput="filterConsultItems()" placeholder="Nhập tên mẫu áo tắm, mã SKU hoặc màu sắc..."
+            class="sm:col-span-2 p-2.5 text-xs border border-sky-200 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-sky-500">
+          <select id="consultSizeFilter" onchange="filterConsultItems()" class="p-2.5 text-xs border border-sky-200 rounded-xl bg-white font-bold text-sky-900 outline-none">
+            <option value="ALL">Tất cả kích cỡ (Size)</option>
+            <option value="S">Size S</option>
+            <option value="M">Size M</option>
+            <option value="L">Size L</option>
+            <option value="XL">Size XL</option>
+            <option value="2XL">Size 2XL</option>
+            <option value="Free">Freesize / Phụ kiện</option>
+          </select>
+          <select id="consultStockFilter" onchange="filterConsultItems()" class="p-2.5 text-xs border border-sky-200 rounded-xl bg-white font-bold text-sky-900 outline-none">
+            <option value="ALL">Tất cả tình trạng tồn</option>
+            <option value="AVAILABLE">Còn hàng (> 0)</option>
+            <option value="LOW">Sắp hết hàng (1 - 5 chiếc)</option>
+            <option value="OUT">Tạm hết hàng (0 chiếc)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-sky-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto max-h-[550px]">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-sky-50 text-sky-900 font-bold border-b border-sky-100 uppercase sticky top-0">
+              <tr>
+                <th class="p-3">Mã SKU</th>
+                <th class="p-3">Tên Mẫu</th>
+                <th class="p-3">Size</th>
+                <th class="p-3">Màu Sắc</th>
+                <th class="p-3">Tồn Kho Khả Dụng</th>
+                <th class="p-3">Tình Trạng Tư Vấn</th>
+                <th class="p-3 text-right">Bán Tại Quầy</th>
+              </tr>
+            </thead>
+            <tbody id="consultTableBody" class="divide-y divide-sky-50"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="py-4 text-center text-xs text-slate-400 border-t border-sky-100">
+    © 2026 Soobin Swimwear — Cổng Vận Hành Nhân Viên Bán Hàng, Quầy POS & Clienteling CRM (SALES Portal).
+  </footer>
+
+  <script>
+    let allBalances = [];
+    let posCart = [];
+    let crmCustomersCache = [];
+    let posActiveVouchersCache = [];
+    let posActiveCategoryFilter = '';
+    let posStoreBankConfig = {
+      bank_code: 'MB',
+      bank_name: 'MB Bank',
+      account_no: '0389123456789',
+      account_name: 'SOOBIN FASHION CO LTD'
+    };
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await verifySalesAccess();
+      loadPosStoreBankConfig();
+      loadSalesOrders();
+      loadConsultStock();
+      loadCrmCustomers();
+      loadStylistFeedbacks();
+      loadSalesRmaRequests();
+      loadPosShiftSummary();
+      renderPosCart();
+      if (window.startLiveSync) window.startLiveSync(async () => {
+        await Promise.all([loadSalesOrders(), loadConsultStock(), loadStylistFeedbacks(), loadSalesRmaRequests(), loadPosShiftSummary()]);
+      }, 5000);
+    });
+
+    async function loadPosShiftSummary() {
+      try {
+        const token = localStorage.getItem('session_token');
+        const res = await fetch('/api/v1/orders/pos-shift-summary', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const cntEl = document.getElementById('posShiftCount');
+        const cashEl = document.getElementById('posShiftCash');
+        const qrEl = document.getElementById('posShiftVietqr');
+        const totEl = document.getElementById('posShiftTotal');
+        if (cntEl) cntEl.innerText = `${data.pos_order_count || 0} đơn`;
+        if (cashEl) cashEl.innerText = formatCurrency(data.cash_revenue || 0);
+        if (qrEl) qrEl.innerText = formatCurrency(data.vietqr_revenue || 0);
+        if (totEl) totEl.innerText = formatCurrency(data.total_revenue || 0);
+
+        if (Array.isArray(data.active_vouchers)) {
+          posActiveVouchersCache = data.active_vouchers;
+          updatePosLivePricing();
+        }
+
+        const strip = document.getElementById('posActiveVouchersStrip');
+        if (strip && Array.isArray(data.active_vouchers) && data.active_vouchers.length) {
+          strip.innerHTML = `<span class="text-[10px] font-bold text-slate-500">Áp nhanh:</span>` +
+            data.active_vouchers.map(v => {
+              const label = v.discount_type === 'PERCENT' ? `-${v.discount_value}%` : `-${formatCurrency(v.discount_value)}`;
+              return `<button type="button" onclick="applyQuickPosVoucher('${v.code}')" class="px-2 py-0.5 rounded-lg bg-white border border-sky-200 hover:bg-sky-100 text-sky-700 font-mono font-bold text-[10px]">${v.code} (${label})</button>`;
+            }).join('') +
+            `<button type="button" onclick="applyQuickPosVoucher('')" class="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[10px]">Bỏ mã</button>`;
+        }
+      } catch (e) {}
+    }
+
+    function applyQuickPosVoucher(code) {
+      const inp = document.getElementById('posVoucherCode');
+      if (inp) inp.value = code || '';
+      if (typeof window.playRefreshingSelectSound === 'function') {
+        window.playRefreshingSelectSound('size');
+      }
+      updatePosLivePricing();
+    }
+
+    async function loadPosStoreBankConfig() {
+      try {
+        const res = await fetch('/api/v1/site-settings/bank-account');
+        if (!res.ok) return;
+        const cfg = await res.json();
+        const acctNo = cfg?.account_no || cfg?.bank_account_no;
+        if (cfg && acctNo) {
+          posStoreBankConfig = {
+            bank_code: cfg.bank_code || 'MB',
+            bank_name: cfg.bank_name || 'MB Bank',
+            account_no: acctNo,
+            account_name: cfg.account_name || cfg.bank_account_name || 'SOOBIN SWIMWEAR'
+          };
+          updatePosLivePricing();
+        }
+      } catch (e) {}
+    }
+
+    async function verifySalesAccess() {
+      try {
+        const token = localStorage.getItem('session_token');
+        const res = await fetch('/api/v1/auth/me', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (!res.ok) {
+          window.location.href = '/sales/login';
+          return;
+        }
+        const user = await res.json();
+        if (user.role.code !== 'SALES' && user.role.code !== 'ADMIN') {
+          document.getElementById('accessDeniedMsg').innerText =
+            `Bạn đang đăng nhập với vai trò '${user.role.name}' (${user.role.code}). Bạn KHÔNG CÓ QUYỀN truy cập vào Cổng Bán Hàng (SALES)!`;
+          document.getElementById('accessDeniedModal').classList.remove('hidden');
+          lucide.createIcons();
+          return;
+        }
+        document.getElementById('userNameLabel').innerText = user.full_name;
+      } catch (err) {
+        window.location.href = '/sales/login';
+      }
+    }
+
+    function switchTab(tab) {
+      const tabs = ['queue', 'pos', 'crm', 'feedbacks', 'shipments', 'consult'];
+      const apply = () => {
+        tabs.forEach(t => {
+          const btn = document.getElementById(`btnTab${capitalize(t)}`);
+          const content = document.getElementById(`tabContent${capitalize(t)}`);
+          if (t === tab) {
+            if (btn) btn.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-sky-600 text-white transition flex items-center gap-1.5 shadow";
+            if (content) {
+              content.classList.remove("hidden", "morph-entering");
+              void content.offsetWidth;
+              content.classList.add("morph-entering");
+            }
+          } else {
+            if (btn) btn.className = "px-3 py-1.5 text-xs font-bold rounded-lg hover:bg-sky-900 text-sky-200 transition flex items-center gap-1.5";
+            if (content) content.classList.add("hidden");
+          }
+        });
+        lucide.createIcons();
+      };
+      if (document.startViewTransition) document.startViewTransition(apply);
+      else apply();
+    }
+
+    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    let salesAllOrdersCache = [];
+
+    async function loadSalesOrders() {
+      try {
+        const token = localStorage.getItem('session_token');
+        const res = await fetch("/api/v1/orders", {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (!res.ok) return;
+        salesAllOrdersCache = await res.json();
+
+        const pending = salesAllOrdersCache.filter(o => o.status === 'Chưa xử lý');
+        const shipped = salesAllOrdersCache.filter(o => o.tracking_code);
+        document.getElementById("salesKpiPending").innerText = `${pending.length} đơn`;
+        document.getElementById("salesKpiShipping").innerText = `${shipped.length} vận đơn`;
+
+        renderSalesOrdersTable();
+        renderSalesShipmentsTable();
+      } catch (err) {}
+    }
+
+    function renderSalesOrdersTable() {
+      const tbody = document.getElementById("salesOrdersTableBody");
+      if (!tbody) return;
+      const q = (document.getElementById("salesOrderSearchInput")?.value || "").toLowerCase();
+      const statusFilter = document.getElementById("salesOrderStatusFilter")?.value || "Chưa xử lý";
+
+      const filtered = salesAllOrdersCache.filter(o => {
+        if (statusFilter !== "ALL" && o.status !== statusFilter) return false;
+        if (!q) return true;
+        return (
+          (o.code || "").toLowerCase().includes(q) ||
+          (o.recipient_name || "").toLowerCase().includes(q) ||
+          (o.recipient_phone || "").toLowerCase().includes(q)
+        );
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Không có đơn hàng nào khớp bộ lọc hiện tại.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(o => `
+        <tr class="hover:bg-sky-50/50">
+          <td class="p-3">
+            <span class="font-bold text-sky-700 block">${o.code}</span>
+            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-700">${o.status}</span>
+          </td>
+          <td class="p-3">
+            <span class="font-bold block">${o.recipient_name}</span>
+            <span class="text-[10px] text-slate-400 font-mono">${o.recipient_phone}</span>
+          </td>
+          <td class="p-3 text-slate-600 text-[11px] max-w-xs truncate">${o.shipping_address || 'Theo địa chỉ mặc định'}</td>
+          <td class="p-3">
+            <span class="font-semibold text-slate-700 block">${o.payment_method}</span>
+            ${o.bank_account ? `<span class="text-[10px] font-mono text-slate-400">${o.bank_account.bank_code}: ${o.bank_account.account_no}</span>` : ''}
+          </td>
+          <td class="p-3 font-extrabold text-slate-900">${formatCurrency(o.total_amount)}</td>
+          <td class="p-3 space-y-1">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold inline-block ${o.payment_status === 'PAID' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${o.payment_status}</span>
+            ${(o.customer_reported_transfer && o.payment_status !== 'PAID')
+              ? `<span class="block text-[10px] font-extrabold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">🔔 Khách báo đã CK (${o.customer_transfer_ref || 'Chờ đối soát'})</span>`
+              : ''
+            }
+          </td>
+          <td class="p-3 text-right space-x-1 whitespace-nowrap">
+            ${(o.payment_status !== 'PAID' && o.status !== 'Đã hủy') ? `
+              <button onclick="confirmSalesBankTransfer(${o.id}, '${o.code}', ${o.total_amount})" class="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-lg text-[11px] shadow-sm transition">
+                💳 Xác Nhận Đã CK
+              </button>
+            ` : ''}
+            ${o.status === 'Chưa xử lý' ? `
+              <button onclick="confirmSalesOrder(${o.id})" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-lg text-xs shadow transition">
+                ✓ Duyệt & Gửi GHTK
+              </button>
+              <button onclick="cancelSalesOrder(${o.id}, '${o.code}')" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-lg text-[11px] border border-rose-200 transition">
+                Hủy
+              </button>
+            ` : ''}
+            <button onclick="viewSalesOrderInvoice('${o.invoice_code || o.id}')" class="px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-800 font-bold rounded-lg text-[11px] border border-sky-200 transition">
+              🧾 HĐ & QR
+            </button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderSalesShipmentsTable() {
+      const shipTbody = document.getElementById("salesShipmentsTableBody");
+      if (!shipTbody) return;
+      const q = (document.getElementById("salesShipmentSearchInput")?.value || "").toLowerCase();
+      const statusMode = document.getElementById("salesShipmentStatusFilter")?.value || "ALL";
+
+      const shipped = salesAllOrdersCache.filter(o => {
+        if (!o.tracking_code) return false;
+        const st = (o.shipment_status || o.status || "").toUpperCase();
+        if (statusMode === "ACTIVE" && (st.includes("DELIVERED") || o.status === "Đã giao" || st.includes("FAILED") || o.status === "Đã hủy")) return false;
+        if (statusMode === "DELIVERED" && !(st.includes("DELIVERED") || o.status === "Đã giao")) return false;
+        if (statusMode === "FAILED" && !(st.includes("FAILED") || o.status === "Chờ hoàn tiền")) return false;
+        if (!q) return true;
+        return (
+          (o.tracking_code || "").toLowerCase().includes(q) ||
+          (o.code || "").toLowerCase().includes(q) ||
+          (o.recipient_name || "").toLowerCase().includes(q)
+        );
+      });
+
+      if (!shipped.length) {
+        shipTbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Chưa có vận đơn GHTK phù hợp bộ lọc.</td></tr>`;
+        return;
+      }
+
+      shipTbody.innerHTML = shipped.map(o => {
+        const st = o.shipment_status || o.status || 'Đang vận chuyển';
+        const isDone = o.status === 'Đã giao' || st === 'DELIVERED';
+        const isFailed = st === 'DELIVERY_FAILED' || o.status === 'Chờ hoàn tiền';
+        const badgeCls = isDone
+          ? 'bg-emerald-100 text-emerald-800'
+          : (isFailed ? 'bg-rose-100 text-rose-800' : 'bg-indigo-100 text-indigo-800');
+        return `
+          <tr class="hover:bg-sky-50/50">
+            <td class="p-3 font-mono font-bold text-sky-700">${o.tracking_code}</td>
+            <td class="p-3 font-bold text-slate-800">${o.code}</td>
+            <td class="p-3">
+              <span class="font-semibold block">${o.recipient_name}</span>
+              <span class="text-[10px] text-slate-400 font-mono">${o.recipient_phone || ''}</span>
+            </td>
+            <td class="p-3 font-bold text-emerald-700">GHTK Express</td>
+            <td class="p-3">${formatCurrency(o.shipping_fee)}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCls}">${st} (${o.status})</span></td>
+            <td class="p-3 text-right space-x-1 whitespace-nowrap">
+              ${!isDone && !isFailed ? `
+                <button onclick="updateGhtkShipmentStatus('${o.tracking_code}', 'IN_TRANSIT')" class="px-2 py-1 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold text-[10px]">
+                  🚚 Đang Giao
+                </button>
+                <button onclick="updateGhtkShipmentStatus('${o.tracking_code}', 'DELIVERED')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[10px] shadow-sm">
+                  ✅ Đã Giao & Xuất HĐ
+                </button>
+                <button onclick="updateGhtkShipmentStatus('${o.tracking_code}', 'DELIVERY_FAILED')" class="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[10px] border border-rose-200">
+                  ⚠️ Giao Thất Bại
+                </button>
+              ` : ''}
+              <button onclick="viewSalesOrderInvoice('${o.invoice_code || o.id}')" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[10px]">
+                🧾 Xem HĐ
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function updateGhtkShipmentStatus(trackingCode, deliveryStatus) {
+      let reason = null;
+      if (deliveryStatus === 'DELIVERY_FAILED') {
+        reason = await promptDialog(`Xác nhận vận đơn ${trackingCode} giao không thành công. Nhập lý do hoàn hàng:`, "Khách hẹn giao lại / Không liên lạc được");
+        if (reason === null) return;
+      }
+      const res = await fetch('/api/v1/mock/shipping/webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tracking_code: trackingCode,
+          delivery_status: deliveryStatus,
+          reason: reason
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        notify(data.detail || 'Không thể cập nhật trạng thái vận đơn GHTK.', 'error');
+        return;
+      }
+      notify(data.message || `Đã cập nhật vận đơn ${trackingCode} sang ${deliveryStatus}!`, 'success');
+      if (typeof window.playRefreshingSelectSound === 'function') window.playRefreshingSelectSound('select');
+      await Promise.all([loadSalesOrders(), loadConsultStock(), loadPosShiftSummary()]);
+    }
+
+    async function bulkDeliverActiveShipments() {
+      const active = salesAllOrdersCache.filter(o => o.tracking_code && o.status !== 'Đã giao' && o.status !== 'Đã hủy' && o.status !== 'Chờ hoàn tiền');
+      if (!active.length) {
+        notify('Không có vận đơn nào đang giao cần hoàn tất.', 'info');
+        return;
+      }
+      let okCount = 0;
+      for (const o of active) {
+        const res = await fetch('/api/v1/mock/shipping/webhook', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tracking_code: o.tracking_code, delivery_status: 'DELIVERED' })
+        });
+        if (res.ok) okCount++;
+      }
+      notify(`Đã xác nhận giao hàng thành công & phát hành hóa đơn cho ${okCount}/${active.length} vận đơn!`, 'success');
+      await Promise.all([loadSalesOrders(), loadPosShiftSummary()]);
+    }
+
+    async function bulkConfirmEligibleSalesOrders() {
+      const eligible = salesAllOrdersCache.filter(o => o.status === 'Chưa xử lý' && (o.payment_method === 'COD' || o.payment_status === 'PAID'));
+      if (!eligible.length) {
+        notify('Không có đơn chờ xử lý nào đủ điều kiện duyệt tự động (Đơn COD hoặc đã PAID).', 'info');
+        return;
+      }
+      const token = localStorage.getItem('session_token');
+      let confirmedCount = 0;
+      for (const o of eligible) {
+        const res = await fetch(`/api/v1/orders/${o.id}/confirm`, {
+          method: 'POST',
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (res.ok) confirmedCount++;
+      }
+      notify(`⚡ Đã duyệt nhanh & đẩy sang GHTK thành công ${confirmedCount}/${eligible.length} đơn hàng!`, 'success');
+      if (typeof window.playRefreshingSelectSound === 'function') window.playRefreshingSelectSound('select');
+      await loadSalesOrders();
+    }
+
+    async function cancelSalesOrder(orderId, orderCode) {
+      const reason = await promptDialog(`Nhập lý do hủy đơn hàng ${orderCode}:`, "Khách hàng liên hệ nhờ hủy đơn / Đổi mẫu khác");
+      if (!reason) return;
+      const token = localStorage.getItem('session_token');
+      const res = await fetch(`/api/v1/orders/${orderId}/cancel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ reason })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        notify(data.detail || 'Không thể hủy đơn hàng.', 'error');
+        return;
+      }
+      notify(data.message || `Đã hủy đơn hàng ${orderCode}.`, 'success');
+      await Promise.all([loadSalesOrders(), loadConsultStock()]);
+    }
+
+    async function viewSalesOrderInvoice(codeOrId) {
+      const token = localStorage.getItem('session_token');
+      const res = await fetch(`/api/v1/orders/invoices/${encodeURIComponent(codeOrId)}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const inv = await res.json();
+      if (!res.ok) {
+        notify(inv.detail || 'Không tìm thấy hóa đơn.', 'error');
+        return;
+      }
+      const bank = inv.bank_account || {};
+      const qrUrl = inv.payment_qr_url || bank.qr_url || '';
+      const box = document.getElementById('posInvoiceContent');
+      box.innerHTML = `
+        <div class="p-4 rounded-2xl bg-slate-50 border space-y-2.5 text-xs">
+          <div class="flex justify-between items-center border-b pb-2">
+            <div>
+              <strong class="text-sm text-sky-900 block">Mã HĐ: ${inv.invoice_code || inv.code}</strong>
+              <span class="text-[11px] font-mono text-slate-500">Đơn hàng: ${inv.order_code}</span>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full font-extrabold text-[10px] ${inv.payment_status === 'PAID' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+              ${inv.payment_status}
+            </span>
+          </div>
+          <div>Khách hàng: <strong>${inv.customer_name}</strong> (${inv.customer_phone})</div>
+          <div>Địa chỉ: ${inv.shipping_address || ''}</div>
+          <div class="border-t pt-2 space-y-1">
+            ${(inv.items || []).map(it => `<div class="flex justify-between"><span>${it.product_name} (${it.size || ''}) × ${it.quantity}</span><strong class="font-mono">${formatCurrency(it.line_total)}</strong></div>`).join('')}
+          </div>
+          <div class="border-t pt-2 flex justify-between font-extrabold text-sm">
+            <span>Tổng thanh toán:</span>
+            <span class="text-rose-600">${formatCurrency(inv.total_amount)}</span>
+          </div>
+          <div class="border-t pt-2.5 grid grid-cols-1 sm:grid-cols-3 gap-2 items-center bg-white p-2.5 rounded-xl border border-sky-100">
+            <div class="sm:col-span-2 text-[11px] space-y-0.5">
+              <div class="font-extrabold text-sky-800 uppercase text-[10px]">🏦 Tài Khoản Nhận Chuyển Khoản</div>
+              <div>NH: <strong>${bank.bank_name || 'MB Bank'} (${bank.bank_code || 'MB'})</strong></div>
+              <div>Số TK: <strong class="font-mono text-emerald-700">${bank.account_no || ''}</strong></div>
+              <div>Chủ TK: <strong>${bank.account_name || ''}</strong></div>
+              <div>Nội dung: <strong class="font-mono text-sky-700">${bank.transfer_content || ('SOOBIN ' + inv.order_code)}</strong></div>
+            </div>
+            ${qrUrl ? `<div class="text-center"><img src="${qrUrl}" alt="VietQR" class="w-24 h-24 mx-auto rounded border p-1 bg-white object-contain" /></div>` : ''}
+          </div>
+        </div>
+      `;
+      const modal = document.getElementById('posInvoiceModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    async function confirmSalesBankTransfer(orderId, orderCode, amount) {
+      const defaultRef = "SALES-CFM-" + Date.now().toString().slice(-6);
+      const ref = await promptDialog(
+        `Xác nhận tài khoản ngân hàng của shop đã nhận ${formatCurrency(amount)} cho đơn ${orderCode}.\nNhập mã giao dịch ngân hàng:`,
+        defaultRef
+      );
+      if (!ref) return;
+      const token = localStorage.getItem('session_token');
+      const res = await fetch(`/api/v1/orders/${orderId}/confirm-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          transaction_ref: ref,
+          transfer_amount: amount,
+          note: "Nhân viên Sales xác nhận đã nhận chuyển khoản"
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        notify(data.detail || "Không thể xác nhận thanh toán.", "error");
+        return;
+      }
+      notify(data.message || "Đã xác nhận thanh toán chuyển khoản thành công!", "success");
+      loadSalesOrders();
+    }
+
+    async function loadSalesRmaRequests() {
+      const tbody = document.getElementById("salesRmaTableBody");
+      if (!tbody) return;
+      const token = localStorage.getItem('session_token');
+      try {
+        const res = await fetch("/api/v1/orders/rma/requests", {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (!res.ok) return;
+        const items = await res.json();
+        if (!items.length) {
+          tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Hiện chưa có yêu cầu Bảo hành / Đổi size / Trả hàng nào từ khách hàng.</td></tr>`;
+          return;
+        }
+        const typeLabelMap = {
+          'EXCHANGE_SIZE': '<span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-extrabold text-[10px]">ĐỔI SIZE / MÀU</span>',
+          'WARRANTY': '<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">BẢO HÀNH SP</span>',
+          'RETURN_REFUND': '<span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-extrabold text-[10px]">TRẢ HÀNG / HOÀN TIỀN</span>'
+        };
+        tbody.innerHTML = items.map(r => `
+          <tr class="hover:bg-sky-50/50">
+            <td class="p-3">
+              <span class="font-mono font-extrabold text-sky-700 block">${r.ticket_id}</span>
+              <span class="text-[11px] font-bold text-slate-600">Đơn: ${r.order_code}</span>
+            </td>
+            <td class="p-3">
+              <span class="font-bold text-slate-900 block">${r.customer_name || 'Khách hàng'}</span>
+              <span class="text-[11px] text-slate-500">${r.customer_phone || ''}</span>
+            </td>
+            <td class="p-3 space-y-1">
+              ${typeLabelMap[r.request_type] || `<span class="px-2 py-0.5 rounded bg-slate-100 font-bold text-[10px]">${r.request_type}</span>`}
+              <span class="block text-[10px] text-slate-500">Ngày thứ ${r.days_since_order ?? 0} / hạn ${r.allowed_window_days ?? 15} ngày</span>
+            </td>
+            <td class="p-3">
+              <p class="font-semibold text-slate-800">${r.reason || ''}</p>
+              ${r.preferred_size ? `<span class="inline-block mt-1 px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-800 font-bold text-[10px]">Size muốn đổi: ${r.preferred_size}</span>` : ''}
+              ${r.resolution_note ? `<p class="text-[10px] text-emerald-700 mt-1">Ghi chú: ${r.resolution_note}</p>` : ''}
+            </td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-sky-100 text-sky-800">${r.status}</span>
+            </td>
+            <td class="p-3 text-right space-x-1 whitespace-nowrap">
+              <button onclick="updateSalesRmaStatus('${r.ticket_id}', 'RECEIVED_BY_SALES')" class="px-2 py-1 rounded bg-sky-600 hover:bg-sky-700 text-white font-bold text-[10px]">Tiếp Nhận</button>
+              <button onclick="updateSalesRmaStatus('${r.ticket_id}', 'APPROVED')" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px]">Duyệt Đổi/BH</button>
+              <button onclick="updateSalesRmaStatus('${r.ticket_id}', 'COMPLETED')" class="px-2 py-1 rounded bg-teal-600 hover:bg-teal-700 text-white font-bold text-[10px]">Hoàn Tất</button>
+            </td>
+          </tr>
+        `).join("");
+      } catch (err) {}
+    }
+
+    async function updateSalesRmaStatus(ticketId, status) {
+      const note = await promptDialog(`Cập nhật phiếu ${ticketId} sang trạng thái [${status}]. Nhập ghi chú CSKH:`, "Nhân viên Sales đã liên hệ xác nhận thông tin bảo hành/đổi size với khách hàng");
+      if (note === null) return;
+      const token = localStorage.getItem('session_token');
+      const res = await fetch(`/api/v1/orders/rma/requests/${encodeURIComponent(ticketId)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ status, resolution_note: note })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        notify(data.message || "Đã cập nhật phiếu Bảo hành / Đổi size!", "success");
+        loadSalesRmaRequests();
+        loadStylistFeedbacks();
+      } else {
+        notify(data.detail || "Lỗi cập nhật phiếu RMA.", "error");
+      }
+    }
+
+    async function confirmSalesOrder(id) {
+      const token = localStorage.getItem('session_token');
+      try {
+        const res = await fetch(`/api/v1/orders/${id}/confirm`, {
+          method: 'POST',
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        const data = await res.json();
+        if (!res.ok) notify(data.detail || "Lỗi duyệt đơn", "error");
+        else {
+          notify(`Đã xác nhận đơn hàng! Vận đơn GHTK: ${data.tracking_code}`, "success");
+          loadSalesOrders();
+        }
+      } catch (err) {
+        notify("Lỗi kết nối.", "error");
+      }
+    }
+
+    async function loadConsultStock() {
+      try {
+        const token = localStorage.getItem('session_token');
+        const res = await fetch("/api/v1/inventory/balances", {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (!res.ok) return;
+        allBalances = await res.json();
+        renderConsultTable(allBalances);
+        renderPosCatalogPicker();
+      } catch (err) {}
+    }
+
+    function renderConsultTable(items) {
+      const tbody = document.getElementById("consultTableBody");
+      tbody.innerHTML = items.map(b => {
+        const sizeLabel = b.size_name || b.size || 'Free';
+        const colorLabel = b.color_name || b.color || 'Tiêu chuẩn';
+        return `
+          <tr class="hover:bg-sky-50/50">
+            <td class="p-3 font-mono font-bold text-slate-700">${b.sku}</td>
+            <td class="p-3 font-bold text-slate-900">${b.product_name}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold">${sizeLabel}</span></td>
+            <td class="p-3">${colorLabel}</td>
+            <td class="p-3 font-extrabold ${b.available_quantity > 0 ? 'text-emerald-600' : 'text-rose-600'}">${b.available_quantity} chiếc</td>
+            <td class="p-3">
+              ${b.available_quantity > 5 ?
+                '<span class="text-emerald-600 font-bold text-[11px]">✓ Sẵn sàng tư vấn & chốt</span>' :
+                (b.available_quantity > 0 ?
+                  '<span class="text-amber-600 font-bold text-[11px]">⚠️ Sắp hết hàng (Dưới 5 chiếc)</span>' :
+                  '<span class="text-rose-600 font-bold text-[11px]">✗ Tạm hết hàng</span>')}
+            </td>
+            <td class="p-3 text-right">
+              ${b.available_quantity > 0
+                ? `<button onclick="addVariantToPosCart(${b.variant_id}); switchTab('pos');" class="px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px]">+ Thêm vào POS</button>`
+                : `<span class="text-slate-400 text-[11px]">Hết hàng</span>`
+              }
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function filterConsultItems() {
+      const q = (document.getElementById("consultSearchInput")?.value || "").toLowerCase();
+      const sizeFilter = document.getElementById("consultSizeFilter")?.value || "ALL";
+      const stockFilter = document.getElementById("consultStockFilter")?.value || "ALL";
+
+      const filtered = allBalances.filter(b => {
+        const sizeLabel = (b.size_name || b.size || 'Free').trim();
+        if (sizeFilter !== "ALL" && sizeLabel.toUpperCase() !== sizeFilter.toUpperCase()) return false;
+
+        const qty = Number(b.available_quantity || 0);
+        if (stockFilter === "AVAILABLE" && qty <= 0) return false;
+        if (stockFilter === "LOW" && !(qty > 0 && qty <= 5)) return false;
+        if (stockFilter === "OUT" && qty > 0) return false;
+
+        if (!q) return true;
+        return (
+          b.sku.toLowerCase().includes(q) ||
+          b.product_name.toLowerCase().includes(q) ||
+          sizeLabel.toLowerCase().includes(q) ||
+          (b.color_name || b.color || '').toLowerCase().includes(q)
+        );
+      });
+      const badge = document.getElementById("consultMatchCountBadge");
+      if (badge) badge.innerText = `Hiển thị ${filtered.length} / ${allBalances.length} biến thể`;
+      renderConsultTable(filtered);
+    }
+
+    function setPosCategoryFilter(cat) {
+      posActiveCategoryFilter = cat || '';
+      const cats = ['', 'Bikini', 'Áo tắm', 'Quần bơi', 'Kính', 'Túi', 'SALE'];
+      cats.forEach(c => {
+        const id = c === '' ? 'posCatBtn-all' : `posCatBtn-${c}`;
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        if (c === posActiveCategoryFilter) {
+          btn.className = "px-3 py-1.5 rounded-xl bg-sky-600 text-white shadow-sm transition";
+        } else if (c === 'SALE') {
+          btn.className = "px-3 py-1.5 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 transition";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-sky-50 transition";
+        }
+      });
+      renderPosCatalogPicker();
+    }
+
+    function getVariantUnitPrice(b) {
+      const discounted = Number(b.discounted_price || b.base_price || 350000);
+      return discounted > 0 ? discounted : 350000;
+    }
+
+    function renderPosCatalogPicker() {
+      const box = document.getElementById("posVariantGrid");
+      if (!box) return;
+      const q = (document.getElementById("posSearchInput")?.value || "").toLowerCase();
+      const catFilter = posActiveCategoryFilter.toLowerCase();
+
+      const available = allBalances.filter(b => {
+        if (b.available_quantity <= 0) return false;
+        const matchQuery = !q ||
+          b.sku.toLowerCase().includes(q) ||
+          b.product_name.toLowerCase().includes(q) ||
+          (b.size_name || b.size || '').toLowerCase().includes(q) ||
+          (b.color_name || b.color || '').toLowerCase().includes(q);
+        if (!matchQuery) return false;
+
+        if (!catFilter) return true;
+        if (catFilter === 'sale') {
+          return Number(b.discount_percent || 0) > 0;
+        }
+        const hay = `${b.category_name || ''} ${b.product_name || ''}`.toLowerCase();
+        return hay.includes(catFilter);
+      }).slice(0, 48);
+
+      if (!available.length) {
+        box.innerHTML = `<div class="col-span-2 p-6 text-center text-xs text-slate-400">Không tìm thấy biến thể đồ bơi còn tồn kho phù hợp.</div>`;
+        return;
+      }
+
+      box.innerHTML = available.map(b => {
+        const sizeLabel = b.size_name || b.size || 'S';
+        const colorLabel = b.color_name || b.color || 'Xanh Đại Dương';
+        const unitPrice = getVariantUnitPrice(b);
+        const basePrice = Number(b.base_price || unitPrice);
+        const discountPct = Number(b.discount_percent || 0);
+        const imgUrl = b.image_url || '/static/images/products/bikini_1.jpg';
+        return `
+          <div class="p-3 rounded-2xl border border-slate-200 hover:border-sky-400 bg-slate-50/70 flex items-center justify-between gap-2.5 transition shadow-sm">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <img src="${imgUrl}" alt="${b.product_name}" class="w-12 h-14 rounded-xl object-cover border border-sky-100 shrink-0 bg-white" />
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-mono font-bold text-[10px] text-sky-700">${b.sku}</span>
+                  ${discountPct > 0 ? `<span class="px-1.5 py-0.2 rounded bg-rose-500 text-white font-extrabold text-[9px]">-${discountPct}%</span>` : ''}
+                </div>
+                <h4 class="font-bold text-xs text-slate-900 truncate">${b.product_name}</h4>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                  <span class="font-extrabold text-xs text-rose-600">${formatCurrency(unitPrice)}</span>
+                  ${discountPct > 0 ? `<span class="text-[10px] text-slate-400 line-through">${formatCurrency(basePrice)}</span>` : ''}
+                </div>
+                <span class="text-[10px] text-slate-500 block">Size <b>${sizeLabel}</b> • ${colorLabel} • Tồn: <b class="text-emerald-600">${b.available_quantity}</b></span>
+              </div>
+            </div>
+            <button type="button" onclick="addVariantToPosCart(${b.variant_id})" class="shrink-0 px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs shadow-sm">
+              + Chọn
+            </button>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function addVariantToPosCart(variantId) {
+      const v = allBalances.find(x => x.variant_id === variantId);
+      if (!v || v.available_quantity <= 0) return;
+      if (typeof window.playRefreshingSelectSound === 'function') {
+        window.playRefreshingSelectSound('select');
+      }
+      const unitPrice = getVariantUnitPrice(v);
+      const existing = posCart.find(x => x.variant_id === variantId);
+      if (existing) {
+        if (existing.quantity + 1 > v.available_quantity) {
+          notify("Đã đạt tối đa tồn kho khả dụng của biến thể này.", "error");
+          return;
+        }
+        existing.quantity += 1;
+        existing.unit_price = unitPrice;
+      } else {
+        posCart.push({
+          variant_id: v.variant_id,
+          sku: v.sku,
+          product_name: v.product_name,
+          size_name: v.size_name || v.size || '',
+          color_name: v.color_name || v.color || '',
+          image_url: v.image_url || '/static/images/products/bikini_1.jpg',
+          unit_price: unitPrice,
+          base_price: Number(v.base_price || unitPrice),
+          discount_percent: Number(v.discount_percent || 0),
+          quantity: 1,
+          max_qty: v.available_quantity
+        });
+      }
+      renderPosCart();
+    }
+
+    function updatePosCartQty(variantId, delta) {
+      const idx = posCart.findIndex(x => x.variant_id === variantId);
+      if (idx === -1) return;
+      const next = posCart[idx].quantity + delta;
+      if (next <= 0) posCart.splice(idx, 1);
+      else if (next <= posCart[idx].max_qty) posCart[idx].quantity = next;
+      renderPosCart();
+    }
+
+    function clearPosCart() {
+      posCart = [];
+      const cashInput = document.getElementById("posCashTenderedInput");
+      if (cashInput) cashInput.value = "";
+      renderPosCart();
+    }
+
+    function renderPosCart() {
+      const box = document.getElementById("posCartItemsList");
+      const qtyLabel = document.getElementById("posTotalQty");
+      if (!box) return;
+      const totalQty = posCart.reduce((s, i) => s + i.quantity, 0);
+      if (qtyLabel) qtyLabel.innerText = `${totalQty} sản phẩm`;
+      if (!posCart.length) {
+        box.innerHTML = `<div class="p-4 text-center text-slate-400 border border-dashed rounded-2xl">Chưa có sản phẩm trong giỏ POS. Hãy chọn mẫu đồ bơi bên trái.</div>`;
+        updatePosLivePricing();
+        return;
+      }
+      box.innerHTML = posCart.map(item => {
+        const lineTotal = (item.unit_price || 0) * item.quantity;
+        return `
+          <div class="p-2.5 rounded-xl bg-sky-50/70 border border-sky-100 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <img src="${item.image_url || '/static/images/products/bikini_1.jpg'}" class="w-9 h-10 rounded-lg object-cover border bg-white shrink-0" />
+              <div class="min-w-0">
+                <span class="font-bold text-slate-900 block truncate">${item.product_name}</span>
+                <span class="text-[10px] text-slate-500 font-mono block">${item.sku} (${item.size_name} / ${item.color_name})</span>
+                <span class="text-[11px] font-extrabold text-sky-700">${formatCurrency(item.unit_price)} × ${item.quantity} = <strong class="text-rose-600">${formatCurrency(lineTotal)}</strong></span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button type="button" onclick="updatePosCartQty(${item.variant_id}, -1)" class="w-6 h-6 rounded-lg bg-white border font-bold hover:bg-slate-100">-</button>
+              <span class="w-6 text-center font-extrabold">${item.quantity}</span>
+              <button type="button" onclick="updatePosCartQty(${item.variant_id}, 1)" class="w-6 h-6 rounded-lg bg-white border font-bold hover:bg-slate-100">+</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+      updatePosLivePricing();
+    }
+
+    function lookupPosCustomerByPhone(phoneRaw) {
+      const phone = (phoneRaw || "").trim();
+      const badge = document.getElementById("posVipTierBadge");
+      if (!phone || phone.length < 6) {
+        if (badge) badge.classList.add("hidden");
+        return;
+      }
+      const match = crmCustomersCache.find(c => (c.phone || "").includes(phone));
+      if (match) {
+        const nameInput = document.getElementById("posCustomerName");
+        if (nameInput && !nameInput.value.trim()) {
+          nameInput.value = match.full_name;
+        } else if (nameInput && match.phone === phone) {
+          nameInput.value = match.full_name;
+        }
+        if (badge) {
+          badge.innerText = `★ KHÁCH ${match.vip_tier} (${match.order_count} đơn)`;
+          badge.classList.remove("hidden");
+        }
+      } else if (badge) {
+        badge.classList.add("hidden");
+      }
+    }
+
+    function fillWalkInGuestPos() {
+      document.getElementById("posCustomerPhone").value = "0909888999";
+      document.getElementById("posCustomerName").value = "Khách Lẻ Mua Tại Quầy Showroom";
+      const badge = document.getElementById("posVipTierBadge");
+      if (badge) {
+        badge.innerText = "KHÁCH LẺ TẠI QUẦY";
+        badge.classList.remove("hidden");
+      }
+    }
+
+    function computePosLiveTotals() {
+      const subtotal = posCart.reduce((s, i) => s + (Number(i.unit_price || 0) * i.quantity), 0);
+      const fulfillment = document.getElementById("posFulfillmentType")?.value || "INSTORE_PICKUP";
+      const voucher = (document.getElementById("posVoucherCode")?.value || "").trim().toUpperCase();
+
+      // Calculate automatic 10% threshold discount (>= 500,000 VND) vs Voucher
+      let autoDiscount = subtotal >= 500000 ? Math.round(subtotal * 0.10) : 0;
+      let voucherDiscount = 0;
+      let appliedCode = subtotal >= 500000 ? "AUTO10 (>=500K)" : "Không áp dụng";
+
+      const matchedVoucher = posActiveVouchersCache.find(v => (v.code || "").toUpperCase() === voucher);
+      if (matchedVoucher) {
+        const minOrder = Number(matchedVoucher.min_order_amount || 0);
+        if (subtotal >= minOrder) {
+          if (matchedVoucher.discount_type === "PERCENT") {
+            voucherDiscount = Math.round(subtotal * (Number(matchedVoucher.discount_value || 0) / 100));
+            if (matchedVoucher.max_discount_amount) {
+              voucherDiscount = Math.min(voucherDiscount, Number(matchedVoucher.max_discount_amount));
+            }
+          } else {
+            voucherDiscount = Math.min(subtotal, Math.round(Number(matchedVoucher.discount_value || 0)));
+          }
+        }
+      } else if (voucher === "SOOBIN15") {
+        voucherDiscount = Math.round(subtotal * 0.15);
+      } else if (voucher === "SUMMER20" || voucher === "VIP20") {
+        voucherDiscount = Math.round(subtotal * 0.20);
+      } else if (voucher === "SWIM50K" && subtotal >= 300000) {
+        voucherDiscount = 50000;
+      }
+
+      let discount = autoDiscount;
+      if (voucherDiscount > autoDiscount) {
+        discount = voucherDiscount;
+        appliedCode = voucher;
+      }
+
+      const shipping = (subtotal > 0 && fulfillment === "DELIVERY") ? 30000 : 0;
+      const grandTotal = Math.max(0, subtotal - discount + shipping);
+      return { subtotal, discount, appliedCode, shipping, grandTotal };
+    }
+
+    function updatePosLivePricing() {
+      const { subtotal, discount, appliedCode, shipping, grandTotal } = computePosLiveTotals();
+      const subEl = document.getElementById("posCalcSubtotal");
+      const discEl = document.getElementById("posCalcDiscount");
+      const discLabelEl = document.getElementById("posCalcDiscountLabel");
+      const shipEl = document.getElementById("posCalcShipping");
+      const totalEl = document.getElementById("posCalcGrandTotal");
+
+      if (subEl) subEl.innerText = formatCurrency(subtotal);
+      if (discEl) discEl.innerText = `-${formatCurrency(discount)}`;
+      if (discLabelEl) discLabelEl.innerText = `Chiết khấu ưu đãi (${appliedCode}):`;
+      if (shipEl) shipEl.innerText = formatCurrency(shipping);
+      if (totalEl) totalEl.innerText = formatCurrency(grandTotal);
+
+      // Update Live VietQR Preview at Counter
+      const qrImg = document.getElementById("posLiveQrImg");
+      const bankNameEl = document.getElementById("posLiveBankName");
+      const holderEl = document.getElementById("posLiveAccountHolder");
+      const qrAmountEl = document.getElementById("posLiveQrAmountText");
+
+      if (bankNameEl) bankNameEl.innerText = `${posStoreBankConfig.bank_name} • ${posStoreBankConfig.account_no}`;
+      if (holderEl) holderEl.innerText = posStoreBankConfig.account_name;
+      if (qrAmountEl) qrAmountEl.innerText = `Số tiền quét: ${formatCurrency(grandTotal)}`;
+      if (qrImg) {
+        const addInfo = encodeURIComponent("SOOBIN POS TAI QUAY");
+        const accName = encodeURIComponent(posStoreBankConfig.account_name);
+        qrImg.src = `https://img.vietqr.io/image/${posStoreBankConfig.bank_code}-${posStoreBankConfig.account_no}-compact2.png?amount=${Math.round(grandTotal)}&addInfo=${addInfo}&accountName=${accName}`;
+      }
+
+      calculatePosCashChange();
+    }
+
+    function onPosPaymentMethodChange() {
+      const method = document.getElementById("posPaymentMethod")?.value || "CASH";
+      const cashPanel = document.getElementById("posCashCalculatorPanel");
+      const qrPanel = document.getElementById("posVietqrPreviewPanel");
+      if (cashPanel) cashPanel.classList.toggle("hidden", method !== "CASH");
+      if (qrPanel) qrPanel.classList.toggle("hidden", method !== "VIETQR");
+      updatePosLivePricing();
+    }
+
+    function setPosQuickCash(amount) {
+      const { grandTotal } = computePosLiveTotals();
+      const input = document.getElementById("posCashTenderedInput");
+      if (!input) return;
+      input.value = amount === 'EXACT' ? Math.round(grandTotal) : Number(amount);
+      calculatePosCashChange();
+    }
+
+    function calculatePosCashChange() {
+      const { grandTotal } = computePosLiveTotals();
+      const input = document.getElementById("posCashTenderedInput");
+      const out = document.getElementById("posChangeDueText");
+      if (!out) return;
+      const tendered = Number(input?.value || 0);
+      if (grandTotal <= 0) {
+        out.innerText = "0 ₫";
+        out.className = "text-sm font-black font-mono text-emerald-700";
+        return;
+      }
+      if (!tendered) {
+        out.innerText = `Cần thu: ${formatCurrency(grandTotal)}`;
+        out.className = "text-sm font-black font-mono text-sky-700";
+        return;
+      }
+      const diff = tendered - grandTotal;
+      if (diff >= 0) {
+        out.innerText = formatCurrency(diff);
+        out.className = "text-sm font-black font-mono text-emerald-700";
+      } else {
+        out.innerText = `Còn thiếu ${formatCurrency(Math.abs(diff))}`;
+        out.className = "text-sm font-black font-mono text-rose-600";
+      }
+    }
+
+    function togglePosAddressRequirement() {
+      const mode = document.getElementById("posFulfillmentType").value;
+      const addr = document.getElementById("posShippingAddress");
+      if (mode === "INSTORE_PICKUP") {
+        addr.value = "Nhận trực tiếp tại Showroom Soobin Swimwear";
+      } else if (addr.value.includes("Showroom Soobin Swimwear")) {
+        addr.value = "";
+        addr.placeholder = "Nhập địa chỉ giao hàng tận nơi qua GHTK...";
+      }
+    }
+
+    async function submitPosOrder(e) {
+      e.preventDefault();
+      if (!posCart.length) {
+        notify("Vui lòng chọn ít nhất 1 sản phẩm đồ bơi vào giỏ POS!", "error");
+        return;
+      }
+      const paymentMethod = document.getElementById("posPaymentMethod").value;
+      const { grandTotal } = computePosLiveTotals();
+      const tenderedVal = Number(document.getElementById("posCashTenderedInput")?.value || 0);
+      const cashTendered = paymentMethod === "CASH" ? (tenderedVal > 0 ? tenderedVal : grandTotal) : grandTotal;
+      const changeDue = Math.max(0, cashTendered - grandTotal);
+      const cartSnapshot = posCart.map(i => ({ ...i }));
+
+      const token = localStorage.getItem('session_token');
+      const payload = {
+        customer_name: document.getElementById("posCustomerName").value.trim(),
+        customer_phone: document.getElementById("posCustomerPhone").value.trim(),
+        shipping_address: document.getElementById("posShippingAddress").value.trim() || "Nhận tại quầy POS",
+        payment_method: paymentMethod,
+        fulfillment_type: document.getElementById("posFulfillmentType").value,
+        voucher_code: document.getElementById("posVoucherCode").value.trim() || null,
+        items: posCart.map(i => ({ variant_id: i.variant_id, quantity: i.quantity }))
+      };
+
+      const res = await fetch("/api/v1/orders/pos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        notify(data.detail || "Không thể tạo đơn POS.", "error");
+        return;
+      }
+      notify(data.message || "Đã tạo đơn POS thành công!", "success");
+      if (typeof window.playOrderCelebrationSound === "function") {
+        window.playOrderCelebrationSound();
+      }
+      clearPosCart();
+      await Promise.all([loadSalesOrders(), loadConsultStock(), loadCrmCustomers(), loadPosShiftSummary()]);
+
+      const o = data.order || {};
+      const bank = o.bank_account || {};
+      const qrUrl = o.payment_qr_url || bank.qr_url || '';
+      const box = document.getElementById("posInvoiceContent");
+      const itemsHtml = cartSnapshot.map(item => `
+        <div class="flex justify-between text-[11px] py-1 border-b border-dashed border-slate-200">
+          <span>${item.product_name} (${item.size_name}) × ${item.quantity}</span>
+          <strong class="font-mono">${formatCurrency((item.unit_price || 0) * item.quantity)}</strong>
+        </div>
+      `).join("");
+
+      box.innerHTML = `
+        <div class="p-3 rounded-2xl bg-sky-50 border border-sky-200 text-sky-900 text-xs font-bold text-center">
+          🌊 Xin chân thành cảm ơn quý khách <strong>${o.recipient_name || 'Quý khách'}</strong> đã mua sắm tại Soobin Swimwear! Chúc quý khách những trải nghiệm bơi lội thật sảng khoái!
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-50 border space-y-2.5">
+          <div class="text-center border-b pb-2">
+            <div class="font-black text-sm text-sky-900 uppercase tracking-wider">SOOBIN SWIMWEAR • AQUATIC SHOWROOM</div>
+            <div class="text-[10px] text-slate-500">Phiếu Thanh Toán Quầy POS K80 • ${new Date().toLocaleString('vi-VN')}</div>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-bold text-slate-600">Mã đơn POS:</span>
+            <strong class="font-mono text-sky-700">${o.code}</strong>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-bold text-slate-600">Mã Hóa Đơn ĐT:</span>
+            <strong class="font-mono text-emerald-700">${o.invoice_code || 'Cấp tự động'}</strong>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-bold text-slate-600">Khách hàng:</span>
+            <strong>${o.recipient_name} (${o.recipient_phone})</strong>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-bold text-slate-600">Phương thức & Trạng thái:</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">${o.payment_method || paymentMethod} • ${o.payment_status}</span>
+          </div>
+          <div class="border-t pt-2 space-y-1">
+            <div class="text-[10px] font-extrabold uppercase text-slate-400">Chi tiết sản phẩm</div>
+            ${itemsHtml}
+          </div>
+          <div class="border-t pt-2 space-y-1">
+            <div class="flex justify-between"><span>Tạm tính:</span><span>${formatCurrency(o.subtotal_amount)}</span></div>
+            <div class="flex justify-between text-rose-600"><span>Giảm giá (${o.applied_promotion_code || 'Không'}):</span><span>-${formatCurrency(o.discount_amount)}</span></div>
+            <div class="flex justify-between"><span>Phí vận chuyển:</span><span>${formatCurrency(o.shipping_fee)}</span></div>
+            <div class="flex justify-between font-extrabold text-sm pt-1 border-t">
+              <span>Tổng thanh toán:</span>
+              <span class="text-sky-700">${formatCurrency(o.total_amount)}</span>
+            </div>
+            ${paymentMethod === 'CASH' ? `
+              <div class="flex justify-between text-emerald-700 font-bold text-xs pt-1">
+                <span>Tiền mặt khách đưa:</span>
+                <span class="font-mono">${formatCurrency(Math.max(cashTendered, o.total_amount || 0))}</span>
+              </div>
+              <div class="flex justify-between text-emerald-800 font-extrabold text-xs">
+                <span>Tiền thừa trả khách:</span>
+                <span class="font-mono">${formatCurrency(Math.max(0, cashTendered - (o.total_amount || 0)))}</span>
+              </div>
+            ` : ''}
+          </div>
+          <div class="border-t pt-2.5 grid grid-cols-1 sm:grid-cols-3 gap-2 items-center bg-white p-2.5 rounded-xl border border-sky-100">
+            <div class="sm:col-span-2 text-[11px] space-y-0.5">
+              <div class="font-extrabold text-sky-800 uppercase text-[10px]">🏦 Tài Khoản Ngân Hàng Nhận Chuyển Khoản Của Shop</div>
+              <div>NH: <strong>${bank.bank_name || 'MB Bank'} (${bank.bank_code || 'MB'})</strong></div>
+              <div>Số TK: <strong class="font-mono text-emerald-700">${bank.account_no || '0389123456789'}</strong></div>
+              <div>Chủ TK: <strong>${bank.account_name || 'SOOBIN FASHION CO LTD'}</strong></div>
+              <div>Số tiền: <strong class="text-rose-600">${formatCurrency(o.total_amount)}</strong></div>
+              <div>Nội dung: <strong class="font-mono text-sky-700">${bank.transfer_content || ('SOOBIN ' + o.code)}</strong></div>
+            </div>
+            ${qrUrl ? `<div class="text-center"><img src="${qrUrl}" alt="VietQR" class="w-24 h-24 mx-auto rounded border p-1 bg-white object-contain" /></div>` : ''}
+          </div>
+        </div>
+      `;
+      const modal = document.getElementById("posInvoiceModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closePosInvoiceModal() {
+      const modal = document.getElementById("posInvoiceModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    async function loadCrmCustomers() {
+      const grid = document.getElementById("crmCustomersGrid");
+      if (!grid) return;
+      const q = document.getElementById("crmSearchInput")?.value || "";
+      const token = localStorage.getItem('session_token');
+      try {
+        const res = await fetch(`/api/v1/orders/crm/customers?q=${encodeURIComponent(q)}`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (!res.ok) return;
+        crmCustomersCache = await res.json();
+        document.getElementById("salesKpiVipCount").innerText = `${crmCustomersCache.length} hồ sơ`;
+        if (!crmCustomersCache.length) {
+          grid.innerHTML = `<div class="col-span-3 p-6 text-center text-slate-400 bg-white rounded-2xl border">Không tìm thấy hồ sơ khách hàng phù hợp.</div>`;
+          return;
+        }
+        grid.innerHTML = crmCustomersCache.map(c => {
+          const tierColors = {
+            DIAMOND: 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white',
+            GOLD: 'bg-amber-100 text-amber-900 border border-amber-300',
+            SILVER: 'bg-slate-200 text-slate-800',
+            MEMBER: 'bg-sky-50 text-sky-700'
+          };
+          const badgeClass = tierColors[c.vip_tier] || tierColors.MEMBER;
+          return `
+            <div class="bg-white p-5 rounded-2xl border border-sky-100 shadow-sm space-y-3 flex flex-col justify-between">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${badgeClass}">★ ${c.vip_tier}</span>
+                  <span class="text-[11px] font-bold text-slate-400">${c.order_count} đơn hàng</span>
+                </div>
+                <h4 class="font-extrabold text-sm text-slate-900">${c.full_name}</h4>
+                <div class="text-xs text-slate-600 space-y-0.5">
+                  <div>📞 <strong>${c.phone || 'Chưa cập nhật'}</strong></div>
+                  <div>✉️ ${c.email}</div>
+                </div>
+                <div class="pt-2 border-t flex items-center justify-between text-xs">
+                  <span class="text-slate-500">Tổng chi tiêu:</span>
+                  <strong class="text-emerald-600 font-extrabold text-sm">${formatCurrency(c.total_spend)}</strong>
+                </div>
+                <div class="text-[11px] text-slate-500">
+                  Size thường mặc: <strong>${(c.preferred_sizes || []).join(', ') || 'Đa dạng'}</strong>
+                </div>
+              </div>
+              <button onclick="prefillPosFromCrm('${c.full_name.replace(/'/g, '')}', '${(c.phone || '').replace(/'/g, '')}')"
+                class="w-full py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 font-bold text-xs transition">
+                + Tạo Đơn POS Cho Khách Này
+              </button>
+            </div>
+          `;
+        }).join("");
+      } catch (err) {}
+    }
+
+    function prefillPosFromCrm(name, phone) {
+      document.getElementById("posCustomerName").value = name;
+      document.getElementById("posCustomerPhone").value = phone || "0909000111";
+      switchTab('pos');
+    }
+
+    async function loadStylistFeedbacks() {
+      const tbody = document.getElementById("stylistFeedbacksTableBody");
+      if (!tbody) return;
+      const token = localStorage.getItem('session_token');
+      try {
+        const res = await fetch("/api/v1/site-settings/feedbacks", {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (!res.ok) return;
+        const list = await res.json();
+        const openCount = list.filter(x => x.status !== 'RESOLVED').length;
+        document.getElementById("salesKpiFeedbackCount").innerText = `${openCount} phiếu`;
+        if (!list.length) {
+          tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Chưa có phiếu yêu cầu tư vấn Stylist nào.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = list.map(f => `
+          <tr class="hover:bg-sky-50/50">
+            <td class="p-3 font-mono font-bold text-slate-500">#${f.id}</td>
+            <td class="p-3">
+              <strong class="block text-slate-900">${f.full_name}</strong>
+              <span class="text-[11px] text-slate-500">${f.phone || ''} ${f.email ? '• ' + f.email : ''}</span>
+            </td>
+            <td class="p-3 font-bold text-sky-800">${f.subject}</td>
+            <td class="p-3 text-slate-600 max-w-md">${f.message}</td>
+            <td class="p-3 text-slate-400 text-[11px]">${new Date(f.created_at).toLocaleString('vi-VN')}</td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${f.status === 'RESOLVED' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${f.status}</span>
+            </td>
+            <td class="p-3 text-right space-x-1">
+              ${f.status !== 'RESOLVED'
+                ? `<button onclick="updateFeedbackTicket(${f.id}, 'RESOLVED')" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px]">Hoàn Tất Tư Vấn</button>`
+                : `<span class="text-[11px] text-emerald-600 font-bold">✓ Đã xử lý</span>`
+              }
+            </td>
+          </tr>
+        `).join("");
+      } catch (err) {}
+    }
+
+    async function updateFeedbackTicket(id, status) {
+      const token = localStorage.getItem('session_token');
+      const res = await fetch(`/api/v1/site-settings/feedbacks/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ status })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        notify(data.message || "Đã cập nhật phiếu tư vấn!", "success");
+        loadStylistFeedbacks();
+      }
+    }
+
+    function formatCurrency(val) {
+      return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(val || 0);
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('session_token');
+      localStorage.removeItem('user_role');
+      localStorage.removeItem('user_name');
+      window.location.href = '/staff/login';
+    }
+  </script>
+  <script src="/static/vendor/lenis.min.js"></script>
+  <script src="/static/vendor/gsap.min.js"></script>
+  <script src="/static/vendor/ScrollTrigger.min.js"></script>
+  <script src="/static/vendor/Flip.min.js"></script>
+  <script src="/static/vendor/split-type.min.js"></script>
+  <script src="/static/js/creative-engine.js?v=cool_aqua_v2"></script>
+</body>
+</html>

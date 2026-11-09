@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 280">
+  <defs>
+    <clipPath id="canopyClip">
+      <path d="M20 118 Q130 -14 240 118 Q218 134 196 118 Q174 134 152 118 Q130 134 108 118 Q86 134 64 118 Q42 134 20 118Z"/>
+    </clipPath>
+  </defs>
+  <ellipse cx="150" cy="268" rx="70" ry="9" fill="#f59e0b" opacity="0.25"/>
+  <g transform="rotate(-10 130 140)">
+    <line x1="130" y1="40" x2="130" y2="276" stroke="#78350f" stroke-width="7" stroke-linecap="round"/>
+    <g clip-path="url(#canopyClip)">
+      <rect x="0" y="0" width="260" height="140" fill="#fb7185"/>
+      <polygon points="130,26 64,140 108,140" fill="#ffffff"/>
+      <polygon points="130,26 152,140 196,140" fill="#ffffff"/>
+      <polygon points="130,26 0,120 0,140 20,140" fill="#fde68a"/>
+      <polygon points="130,26 240,140 260,140 260,120" fill="#fde68a"/>
+      <path d="M20 118 Q130 -14 240 118" fill="none" stroke="#fff" stroke-opacity="0.35" stroke-width="10"/>
+    </g>
+    <path d="M20 118 Q130 -14 240 118 Q218 134 196 118 Q174 134 152 118 Q130 134 108 118 Q86 134 64 118 Q42 134 20 118Z" fill="none" stroke="#be123c" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="130" cy="34" r="7" fill="#be123c"/>
+  </g>
+</svg>
+

@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soobin Swimwear — Cổng Quản Trị Hệ Thống, RBAC & Kiểm Toán (ADMIN)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/static/vendor/lenis.css">
+  <link rel="stylesheet" href="/static/css/creative-ui.css">
+  <script defer src="/static/js/ui.js"></script>
+  <script defer src="/static/js/live-sync.js"></script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .morph-entering {
+      animation: adminMorphIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes adminMorphIn {
+      0% { opacity: 0; transform: perspective(1100px) translateY(18px) rotateX(5deg) scale(0.98); }
+      100% { opacity: 1; transform: perspective(1100px) translateY(0) rotateX(0deg) scale(1); }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Access Denied Modal -->
+  <div id="accessDeniedModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-rose-500/50 rounded-2xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl">
+      <div class="w-14 h-14 bg-rose-500/20 text-rose-400 rounded-full flex items-center justify-center mx-auto">
+        <i data-lucide="shield-x" class="w-8 h-8"></i>
+      </div>
+      <h3 class="text-lg font-extrabold text-white">Truy Cập Bị Từ Chối!</h3>
+      <p id="accessDeniedMsg" class="text-xs text-slate-300 leading-relaxed"></p>
+      <button onclick="handleLogout()" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-lg transition">
+        Đăng Xuất & Chuyển Cổng Phù Hợp
+      </button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="aquatic-ocean-header border-b border-cyan-800/40 sticky top-0 z-40 shadow-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white shadow-sm">
+          <i data-lucide="waves" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="font-extrabold text-base tracking-tight text-white">SOOBIN <span class="text-sky-400">ADMIN</span></span>
+          <span class="text-[10px] block text-slate-300 font-semibold uppercase tracking-wider">Quản Trị Hệ Thống Đồ Bơi, Phân Quyền & Nhật Ký Kiểm Toán</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex items-center gap-1.5">
+        <button onclick="switchTab('users')" id="btnTabUsers" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-purple-600 text-white transition flex items-center gap-1.5">
+          <i data-lucide="users" class="w-4 h-4"></i> Tài Khoản & Nhân Sự
+        </button>
+        <button onclick="switchTab('roles')" id="btnTabRoles" class="px-3 py-1.5 text-xs font-bold rounded-lg hover:bg-slate-800 text-slate-300 transition flex items-center gap-1.5">
+          <i data-lucide="key-round" class="w-4 h-4"></i> Vai Trò & Quyền Hạn
+        </button>
+        <button onclick="switchTab('promotions')" id="btnTabPromotions" class="px-3 py-1.5 text-xs font-bold rounded-lg hover:bg-slate-800 text-slate-300 transition flex items-center gap-1.5">
+          <i data-lucide="tag" class="w-4 h-4"></i> Khuyến Mãi & Voucher
+        </button>
+        <button onclick="switchTab('wheel')" id="btnTabWheel" class="px-3 py-1.5 text-xs font-bold rounded-lg hover:bg-slate-800 text-slate-300 transition flex items-center gap-1.5">
+          <i data-lucide="ferris-wheel" class="w-4 h-4"></i> Vòng Quay May Mắn
+        </button>
+        <button onclick="switchTab('insights')" id="btnTabInsights" class="px-3 py-1.5 text-xs font-bold rounded-lg hover:bg-slate-800 text-slate-300 transition flex items-center gap-1.5">
+          <i data-lucide="trending-up" class="w-4 h-4"></i> Phân Tích &amp; Tăng Trưởng
+        </button>
+        <button onclick="switchTab('audit')" id="btnTabAudit" class="px-3 py-1.5 text-xs font-bold rounded-lg hover:bg-slate-800 text-slate-300 transition flex items-center gap-1.5">
+          <i data-lucide="scroll-text" class="w-4 h-4"></i> Nhật Ký Kiểm Toán
+        </button>
+        <button onclick="switchTab('system')" id="btnTabSystem" class="px-3 py-1.5 text-xs font-bold rounded-lg hover:bg-slate-800 text-slate-300 transition flex items-center gap-1.5">
+          <i data-lucide="cpu" class="w-4 h-4"></i> Hệ Thống & Portals
+        </button>
+      </nav>
+
+      <!-- User & Logout -->
+      <div class="flex items-center gap-3">
+        <div class="text-right hidden sm:block">
+          <span id="userNameLabel" class="text-xs font-bold text-white block">Admin</span>
+          <span class="text-[10px] text-cyan-300 font-semibold">Quyền Quản Trị (ADMIN)</span>
+        </div>
+        <button onclick="handleLogout()" class="px-3 py-1.5 text-xs font-bold bg-rose-950/60 hover:bg-rose-900 border border-rose-800/60 text-rose-300 rounded-lg flex items-center gap-1.5 transition">
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Đăng Xuất
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- Practical System & Security Overview Strip (/api/v1/admin/system-overview) -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold uppercase text-slate-400 block">Tổng Tài Khoản</span>
+          <strong id="admSysTotalAccounts" class="text-lg font-extrabold text-white">0 tài khoản</strong>
+        </div>
+        <i data-lucide="users" class="w-5 h-5 text-sky-400"></i>
+      </div>
+      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold uppercase text-slate-400 block">Phiên Đăng Nhập Hoạt Động</span>
+          <strong id="admSysActiveSessions" class="text-lg font-extrabold text-emerald-400">0 phiên</strong>
+        </div>
+        <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400"></i>
+      </div>
+      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold uppercase text-slate-400 block">Tài Khoản Đang Khóa</span>
+          <strong id="admSysLockedAccounts" class="text-lg font-extrabold text-rose-400">0 tài khoản</strong>
+        </div>
+        <i data-lucide="lock" class="w-5 h-5 text-rose-400"></i>
+      </div>
+      <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold uppercase text-slate-400 block">Sự Kiện Kiểm Toán</span>
+          <strong id="admSysAuditEvents" class="text-lg font-extrabold text-cyan-300">0 bản ghi</strong>
+        </div>
+        <i data-lucide="scroll-text" class="w-5 h-5 text-cyan-400"></i>
+      </div>
+    </div>
+
+    <!-- 1. USERS & STAFF MANAGEMENT TAB -->
+    <div id="tabContentUsers" class="space-y-4 morph-entering">
+      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        <div>
+          <h2 class="font-extrabold text-lg text-white flex items-center gap-2">
+            <i data-lucide="user-cog" class="w-5 h-5 text-cyan-400"></i> Quản Lý Tài Khoản Nhân Sự & Khách Hàng
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Tạo nhân viên mới, phân vai trò, lọc nhanh theo quyền hạn và khóa/mở khóa tài khoản tức thì.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <input type="text" id="adminUserSearchInput" oninput="renderAdminUsersTable()" placeholder="Tìm tên, email, SĐT..."
+            class="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs text-white w-48 outline-none focus:border-purple-500" />
+          <select id="adminUserRoleFilter" onchange="renderAdminUsersTable()" class="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-bold text-purple-200 outline-none">
+            <option value="ALL">Tất cả Vai trò</option>
+            <option value="ADMIN">ADMIN</option>
+            <option value="MANAGER">MANAGER</option>
+            <option value="SALES">SALES</option>
+            <option value="WAREHOUSE">WAREHOUSE</option>
+            <option value="CUSTOMER">CUSTOMER</option>
+          </select>
+          <select id="adminUserStatusFilter" onchange="renderAdminUsersTable()" class="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-bold text-slate-200 outline-none">
+            <option value="ALL">Tất cả trạng thái</option>
+            <option value="ACTIVE">Đang hoạt động</option>
+            <option value="LOCKED">Đang khóa</option>
+          </select>
+          <button onclick="document.getElementById('createUserFormWrap').classList.toggle('hidden')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-1.5">
+            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> + Tạo Tài Khoản Mới
+          </button>
+          <button onclick="loadAdminUsers()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Làm Mới
+          </button>
+        </div>
+      </div>
+
+      <!-- Create Staff / User Form -->
+      <form id="createUserFormWrap" onsubmit="createStaffUser(event)" class="hidden bg-slate-900 p-5 rounded-2xl border border-purple-800/50 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <h3 class="sm:col-span-2 lg:col-span-5 text-sm font-extrabold text-purple-300 flex items-center gap-1.5">
+          <i data-lucide="badge-plus" class="w-4 h-4"></i> Tạo Tài Khoản Nhân Viên / Người Dùng Mới
+        </h3>
+        <input id="newStaffName" required placeholder="Họ và tên nhân sự" class="rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white" />
+        <input id="newStaffEmail" type="email" required placeholder="Email đăng nhập" class="rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white" />
+        <input id="newStaffPhone" placeholder="Số điện thoại" class="rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white" />
+        <input id="newStaffPassword" type="password" required minlength="8" placeholder="Mật khẩu (>= 8 ký tự)" class="rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white" />
+        <div class="flex gap-2">
+          <select id="newStaffRole" class="flex-1 rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white"></select>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-lg">Lưu</button>
+        </div>
+      </form>
+
+      <!-- Users Table -->
+      <div class="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-800/80 text-slate-300 font-bold border-b border-slate-700 uppercase tracking-wider">
+              <tr>
+                <th class="p-3.5">ID</th>
+                <th class="p-3.5">Họ Tên</th>
+                <th class="p-3.5">Email</th>
+                <th class="p-3.5">Số Điện Thoại</th>
+                <th class="p-3.5">Vai Trò (Role)</th>
+                <th class="p-3.5">Xác Minh</th>
+                <th class="p-3.5">Trạng Thái</th>
+                <th class="p-3.5 text-right">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersTableBody" class="divide-y divide-slate-800 text-slate-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. ROLES & PERMISSIONS (RBAC) TAB -->
+    <div id="tabContentRoles" class="hidden space-y-4">
+      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-sm flex items-center justify-between">
+        <div>
+          <h2 class="font-extrabold text-lg text-white flex items-center gap-2">
+            <i data-lucide="key-round" class="w-5 h-5 text-cyan-400"></i> Quản Lý Vai Trò & Phân Quyền Chi Tiết
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Tạo vai trò tùy chỉnh và cấp quyền truy cập chi tiết theo từng phân hệ nghiệp vụ.</p>
+        </div>
+        <button onclick="loadRolesAndPermissions()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-lg transition">
+          Làm Mới
+        </button>
+      </div>
+
+      <!-- Create Custom Role Form -->
+      <form onsubmit="createNewRole(event)" class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3">
+        <h3 class="text-sm font-extrabold text-white">Tạo Vai Trò (Role) Tùy Chỉnh Mới</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <input id="newRoleCode" required placeholder="Mã Role (VD: CSKH_LEAD)" class="rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white uppercase" />
+          <input id="newRoleName" required placeholder="Tên hiển thị (VD: Trưởng nhóm CSKH)" class="rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white" />
+          <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs rounded-lg">
+            + Tạo Vai Trò Mới
+          </button>
+        </div>
+        <div>
+          <span class="text-[11px] font-bold text-slate-400 block mb-2">Chọn các quyền hạn (Permissions) gán cho vai trò:</span>
+          <div id="permissionsCheckboxes" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs"></div>
+        </div>
+      </form>
+
+      <!-- Existing Roles List -->
+      <div id="rolesListGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </div>
+
+    <!-- LUCKY WHEEL TAB (shared module with Manager portal) -->
+    <div id="tabContentWheel" class="hidden space-y-4">
+      <div id="luckyWheelAdminRoot" data-theme="dark"></div>
+    </div>
+
+    <!-- INSIGHTS & GROWTH TAB (shared module with Manager portal) -->
+    <div id="tabContentInsights" class="hidden space-y-4">
+      <div id="insightsAdminRoot" data-theme="dark"></div>
+    </div>
+
+    <!-- 3. PROMOTIONS & AUTOMATION TAB -->
+    <div id="tabContentPromotions" class="hidden space-y-4">
+      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="font-extrabold text-lg text-white flex items-center gap-2">
+            <i data-lucide="ticket-percent" class="w-5 h-5 text-purple-400"></i> Quản Lý Khuyến Mãi, Voucher & Nhắc Giỏ Hàng Tự Động
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">So sánh 3 phương án: Giảm giá sản phẩm vs Giảm giá đơn hàng vs Voucher (Ưu tiên Sản phẩm -> Đơn hàng -> Voucher).</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="triggerAbandonedCartReminders()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-lg transition flex items-center gap-1.5">
+            <i data-lucide="bell-ring" class="w-3.5 h-3.5"></i> Quét & Nhắc Giỏ Hàng Quá 24h
+          </button>
+          <button onclick="triggerExpiredVietqrOrdersAdmin()" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg transition flex items-center gap-1.5">
+            <i data-lucide="clock" class="w-3.5 h-3.5"></i> Quét & Hủy Đơn VietQR Quá Hạn
+          </button>
+          <button onclick="loadPromotions()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-lg transition">
+            Làm Mới
+          </button>
+        </div>
+      </div>
+
+      <form onsubmit="createVoucher(event)" class="grid grid-cols-1 gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-5 md:grid-cols-2 xl:grid-cols-4">
+        <h3 class="md:col-span-2 xl:col-span-4 text-sm font-extrabold text-white">Tạo chương trình khuyến mãi / Voucher mới</h3>
+        <label class="text-[11px] font-bold text-slate-300">Loại khuyến mãi
+          <select id="promoTypeSelect" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white">
+            <option value="VOUCHER">VOUCHER (Mã giảm giá)</option>
+            <option value="ORDER">ORDER (Giảm theo tổng hóa đơn)</option>
+            <option value="PRODUCT">PRODUCT (Giảm trực tiếp sản phẩm)</option>
+          </select>
+        </label>
+        <label class="text-[11px] font-bold text-slate-300">Mã chương trình / Voucher<input id="voucherCode" required maxlength="50" placeholder="WELCOME15" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white"></label>
+        <label class="text-[11px] font-bold text-slate-300">Tên chương trình<input id="voucherName" required placeholder="Ưu đãi thành viên" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white"></label>
+        <label class="text-[11px] font-bold text-slate-300">Giảm giá (%)<input id="voucherPercent" type="number" min="0.01" max="99.99" step="0.01" required class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white"></label>
+        <label class="text-[11px] font-bold text-slate-300">Đơn tối thiểu (₫)<input id="voucherMinimum" type="number" min="0" value="0" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white"></label>
+        <label class="text-[11px] font-bold text-slate-300">Giới hạn lượt dùng<input id="voucherLimit" type="number" min="1" placeholder="Để trống = không giới hạn" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white"></label>
+        <label class="text-[11px] font-bold text-slate-300">Bắt đầu<input id="voucherStarts" type="datetime-local" required class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white"></label>
+        <label class="text-[11px] font-bold text-slate-300">Kết thúc<input id="voucherEnds" type="datetime-local" required class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white"></label>
+        <label class="text-[11px] font-bold text-slate-300">Đối tượng áp dụng<select id="voucherAudience" onchange="toggleVoucherCustomers()" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white"><option value="all">Tất cả khách hàng</option><option value="selected">Nhóm khách hàng được chọn</option></select></label>
+        <label id="voucherCustomersWrap" class="hidden text-[11px] font-bold text-slate-300 md:col-span-2">Chọn khách hàng (giữ Ctrl để chọn nhiều)<select id="voucherCustomers" multiple size="5" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 p-2 text-xs text-white"></select></label>
+        <div class="flex items-end"><button class="w-full rounded-lg bg-purple-600 px-4 py-2.5 text-xs font-extrabold text-white hover:bg-purple-500">Tạo Chương Trình</button></div>
+      </form>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="promotionsCards"></div>
+    </div>
+
+    <!-- 4. ENTERPRISE AUDIT LOGS TAB -->
+    <div id="tabContentAudit" class="hidden space-y-4">
+      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="font-extrabold text-lg text-white flex items-center gap-2">
+            <i data-lucide="scroll-text" class="w-5 h-5 text-purple-400"></i> Nhật Ký Kiểm Toán Toàn Hệ Thống (Enterprise Audit Trail)
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Theo dõi thời gian thực luồng chuyển trạng thái đơn hàng, biến động tồn kho và sự kiện Outbox bất đồng bộ.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="auditCategoryFilter" onchange="renderAuditLogs()" class="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-bold text-white">
+            <option value="ALL">Tất cả phân hệ</option>
+            <option value="ORDER_FLOW">Luồng Đơn Hàng (ORDER_FLOW)</option>
+            <option value="INVENTORY">Biến Động Kho (INVENTORY)</option>
+            <option value="OUTBOX_AUTOMATION">Outbox & Tự Động Hóa</option>
+          </select>
+          <button onclick="loadAuditLogs()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-lg">Làm mới</button>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+        <div class="overflow-x-auto max-h-[560px]">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-800/90 text-slate-300 font-bold border-b border-slate-700 uppercase sticky top-0">
+              <tr>
+                <th class="p-3.5">Thời Gian</th>
+                <th class="p-3.5">Phân Hệ</th>
+                <th class="p-3.5">Sự Kiện Kiểm Toán</th>
+                <th class="p-3.5">Chi Tiết Kỹ Thuật</th>
+              </tr>
+            </thead>
+            <tbody id="auditLogsTableBody" class="divide-y divide-slate-800 text-slate-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. SYSTEM STATUS & PORTAL LAUNCHER TAB -->
+    <div id="tabContentSystem" class="hidden space-y-4">
+      <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 shadow-sm">
+        <h2 class="font-extrabold text-lg text-white flex items-center gap-2">
+          <i data-lucide="activity" class="w-5 h-5 text-emerald-400"></i> Báo Cáo Sức Khỏe Nền Tảng & Điều Phối Đa Cổng (Multi-Portal Hub)
+        </h2>
+        <p class="text-xs text-slate-400 mt-1">Thông số vận hành kiến trúc MVC Python + PostgreSQL Database 'cnpm' & liên kết nhanh tới tất cả cổng nhân sự</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cơ Sở Dữ Liệu</span>
+          <div class="text-2xl font-black text-emerald-400 flex items-center gap-2">
+            <i data-lucide="database" class="w-6 h-6"></i> PostgreSQL
+          </div>
+          <p class="text-[11px] text-slate-400">Database: <strong>cnpm</strong> (Chuẩn hóa 3NF & Bất biến chứng từ)</p>
+        </div>
+
+        <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Danh Mục Sản Phẩm</span>
+          <div id="sysTotalProducts" class="text-2xl font-black text-purple-400">100 Mẫu</div>
+          <p class="text-[11px] text-slate-400">248 Biến thể (Variants) có sẵn hình ảnh studio & 3D Morph</p>
+        </div>
+
+        <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cổng Phân Quyền</span>
+          <div class="text-2xl font-black text-sky-400">5 Portals</div>
+          <p class="text-[11px] text-slate-400">Admin, Manager, Warehouse, Sales, Customer 3D</p>
+        </div>
+      </div>
+
+      <!-- Quick Portal Switcher for Admin -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <a href="/" target="_blank" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 space-y-1 transition block">
+          <span class="text-[10px] font-extrabold text-cyan-400 uppercase">Storefront</span>
+          <h4 class="font-bold text-white text-sm">Website Mua Sắm Khách Hàng</h4>
+          <p class="text-xs text-slate-400">Đặt hàng đồ bơi, phụ kiện & VietQR</p>
+        </a>
+        <a href="/manager" target="_blank" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 space-y-1 transition block">
+          <span class="text-[10px] font-extrabold text-emerald-400 uppercase">Manager Portal</span>
+          <h4 class="font-bold text-white text-sm">Cổng Quản Lý & Giá Sale</h4>
+          <p class="text-xs text-slate-400">Định giá Sale trực tiếp, KPI & Hoàn tiền</p>
+        </a>
+        <a href="/sales" target="_blank" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 space-y-1 transition block">
+          <span class="text-[10px] font-extrabold text-sky-400 uppercase">Sales & POS Portal</span>
+          <h4 class="font-bold text-white text-sm">Cổng Bán Hàng & Quầy POS</h4>
+          <p class="text-xs text-slate-400">Bán hàng tại quầy, CRM 360° & GHTK</p>
+        </a>
+        <a href="/warehouse" target="_blank" class="p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 space-y-1 transition block">
+          <span class="text-[10px] font-extrabold text-amber-400 uppercase">Warehouse WMS</span>
+          <h4 class="font-bold text-white text-sm">Cổng Thủ Kho & Kiểm Kê</h4>
+          <p class="text-xs text-slate-400">Phiếu nhập, điều chỉnh & kiểm kê thực tế</p>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-900">
+    © 2026 Soobin Swimwear Platform — Quản Trị Hệ Thống Cấp Cao & Kiểm Toán An Toàn.
+  </footer>
+
+  <script>
+    let allRolesCache = [];
+    let allPermissionsCache = [];
+    let auditLogsCache = [];
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await verifyAdminAccess();
+      await loadRolesAndPermissions();
+      loadSystemOverview();
+      loadAdminUsers();
+      loadPromotions();
+      loadVoucherCustomers();
+      loadAuditLogs();
+      if (window.startLiveSync) window.startLiveSync(async () => {
+        const active = document.querySelector('[id^="tabContent"]:not(.hidden)')?.id;
+        await loadSystemOverview();
+        if (active === 'tabContentUsers') await loadAdminUsers();
+        if (active === 'tabContentPromotions') await loadPromotions();
+        if (active === 'tabContentAudit') await loadAuditLogs();
+      }, 6000);
+    });
+
+    async function loadSystemOverview() {
+      try {
+        const token = localStorage.getItem('session_token');
+        const res = await fetch('/api/v1/admin/system-overview', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const totEl = document.getElementById('admSysTotalAccounts');
+        const sessEl = document.getElementById('admSysActiveSessions');
+        const lockEl = document.getElementById('admSysLockedAccounts');
+        const audEl = document.getElementById('admSysAuditEvents');
+        if (totEl) totEl.innerText = `${data.total_accounts || 0} tài khoản`;
+        if (sessEl) sessEl.innerText = `${data.active_sessions || 0} phiên`;
+        if (lockEl) lockEl.innerText = `${data.locked_accounts || 0} tài khoản`;
+        if (audEl) audEl.innerText = `${data.audit_events_count || 0} bản ghi`;
+      } catch (e) {}
+    }
+
+    async function revokeUserSessions(userId) {
+      const token = localStorage.getItem('session_token');
+      const res = await fetch(`/api/v1/admin/users/${userId}/revoke-sessions`, {
+        method: 'POST',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        notify(data.detail || 'Không thể thu hồi phiên đăng nhập.', 'error');
+        return;
+      }
+      notify(data.message || 'Đã thu hồi toàn bộ phiên đăng nhập!', 'success');
+      if (typeof window.playRefreshingSelectSound === 'function') window.playRefreshingSelectSound('select');
+      loadSystemOverview();
+    }
+
+    async function verifyAdminAccess() {
+      try {
+        const token = localStorage.getItem('session_token');
+        const res = await fetch('/api/v1/auth/me', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (!res.ok) {
+          window.location.href = '/admin/login';
+          return;
+        }
+        const user = await res.json();
+        if (user.role.code !== 'ADMIN') {
+          document.getElementById('accessDeniedMsg').innerText =
+            `Bạn đang đăng nhập với vai trò '${user.role.name}' (${user.role.code}). Bạn KHÔNG CÓ QUYỀN truy cập vào Cổng Quản Trị Viên (ADMIN)!`;
+          document.getElementById('accessDeniedModal').classList.remove('hidden');
+          lucide.createIcons();
+          return;
+        }
+        document.getElementById('userNameLabel').innerText = user.full_name;
+      } catch (err) {
+        window.location.href = '/admin/login';
+      }
+    }
+
+    function switchTab(tab) {
+      const tabs = ['users', 'roles', 'promotions', 'wheel', 'insights', 'audit', 'system'];
+      if (tab === 'wheel' && window.soobinWheelAdmin) window.soobinWheelAdmin.load();
+      if (tab === 'insights' && window.soobinInsights) window.soobinInsights.load();
+      const apply = () => {
+        tabs.forEach(t => {
+          const btn = document.getElementById(`btnTab${capitalize(t)}`);
+          const content = document.getElementById(`tabContent${capitalize(t)}`);
+          if (t === tab) {
+            if (btn) btn.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-purple-600 text-white transition flex items-center gap-1.5 shadow";
+            if (content) {
+              content.classList.remove("hidden", "morph-entering");
+              void content.offsetWidth;
+              content.classList.add("morph-entering");
+            }
+          } else {
+            if (btn) btn.className = "px-3 py-1.5 text-xs font-bold rounded-lg hover:bg-slate-800 text-slate-300 transition flex items-center gap-1.5";
+            if (content) content.classList.add("hidden");
+          }
+        });
+        lucide.createIcons();
+      };
+      if (document.startViewTransition) document.startViewTransition(apply);
+      else apply();
+    }
+
+    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    async function loadRolesAndPermissions() {
+      const token = localStorage.getItem('session_token');
+      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+      try {
+        const [rRes, pRes] = await Promise.all([
+          fetch("/api/v1/admin/roles", { headers }),
+          fetch("/api/v1/admin/permissions", { headers })
+        ]);
+        if (rRes.ok) allRolesCache = await rRes.json();
+        if (pRes.ok) allPermissionsCache = await pRes.json();
+
+        const roleSelect = document.getElementById("newStaffRole");
+        if (roleSelect && allRolesCache.length) {
+          roleSelect.innerHTML = allRolesCache.map(r => `<option value="${r.id}">${r.code} (${r.name})</option>`).join("");
+        }
+
+        const permBox = document.getElementById("permissionsCheckboxes");
+        if (permBox) {
+          permBox.innerHTML = allPermissionsCache.map(p => `
+            <label class="flex items-center gap-2 p-2 bg-slate-800/70 rounded-lg border border-slate-700 cursor-pointer">
+              <input type="checkbox" name="newRolePerm" value="${p.id}" class="rounded text-purple-600" />
+              <span><strong class="text-purple-300">${p.code}</strong><br><span class="text-[10px] text-slate-400">${p.description || ''}</span></span>
+            </label>
+          `).join("");
+        }
+
+        const grid = document.getElementById("rolesListGrid");
+        if (grid) {
+          grid.innerHTML = allRolesCache.map(r => `
+            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold ${getRoleBadgeClass(r.code)}">${r.code}</span>
+                  <h4 class="font-bold text-white text-sm mt-1">${r.name}</h4>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">${r.is_system ? 'Role Hệ Thống' : 'Role Tùy Chỉnh'}</span>
+              </div>
+              <div class="flex flex-wrap gap-1 pt-2 border-t border-slate-800">
+                ${(r.permissions || []).map(pc => `<span class="px-2 py-0.5 bg-slate-800 text-purple-300 rounded text-[10px] font-mono">${pc}</span>`).join("") || '<span class="text-xs text-slate-500">Không có quyền đặc biệt</span>'}
+              </div>
+            </div>
+          `).join("");
+        }
+      } catch (err) {}
+    }
+
+    async function createNewRole(e) {
+      e.preventDefault();
+      const code = document.getElementById("newRoleCode").value.trim().toUpperCase();
+      const name = document.getElementById("newRoleName").value.trim();
+      const permIds = [...document.querySelectorAll('input[name="newRolePerm"]:checked')].map(el => Number(el.value));
+      const token = localStorage.getItem('session_token');
+
+      const res = await fetch("/api/v1/admin/roles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ code, name, permission_ids: permIds })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        notify(data.detail || "Không thể tạo vai trò mới.", "error");
+        return;
+      }
+      notify(data.message || `Đã tạo vai trò thành công!`, "success");
+      e.target.reset();
+      await loadRolesAndPermissions();
+    }
+
+    async function createStaffUser(e) {
+      e.preventDefault();
+      const payload = {
+        full_name: document.getElementById("newStaffName").value.trim(),
+        email: document.getElementById("newStaffEmail").value.trim(),
+        phone: document.getElementById("newStaffPhone").value.trim() || null,
+        password: document.getElementById("newStaffPassword").value,
+        role_id: Number(document.getElementById("newStaffRole").value)
+      };
+      const token = localStorage.getItem('session_token');
+      const res = await fetch("/api/v1/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        notify(data.detail || "Lỗi tạo tài khoản.", "error");
+        return;
+      }
+      notify(data.message || "Đã tạo tài khoản thành công!", "success");
+      e.target.reset();
+      document.getElementById("createUserFormWrap").classList.add("hidden");
+      loadAdminUsers();
+    }
+
+    async function changeUserRole(userId, newRoleId) {
+      const token = localStorage.getItem('session_token');
+      const res = await fetch(`/api/v1/admin/users/${userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ role_id: Number(newRoleId) })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        notify(data.detail || "Không thể đổi vai trò.", "error");
+      } else {
+        notify(data.message || "Đã cập nhật vai trò.", "success");
+      }
+      loadAdminUsers();
+    }
+
+    let adminUsersCache = [];
+
+    async function loadAdminUsers() {
+      try {
+        const token = localStorage.getItem('session_token');
+        const res = await fetch("/api/v1/admin/users", {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (!res.ok) return;
+        adminUsersCache = await res.json();
+        renderAdminUsersTable();
+      } catch (err) {}
+    }
+
+    function renderAdminUsersTable() {
+      const tbody = document.getElementById("adminUsersTableBody");
+      if (!tbody) return;
+      const q = (document.getElementById("adminUserSearchInput")?.value || "").toLowerCase();
+      const roleFilter = document.getElementById("adminUserRoleFilter")?.value || "ALL";
+      const statusFilter = document.getElementById("adminUserStatusFilter")?.value || "ALL";
+
+      const users = adminUsersCache.filter(u => {
+        if (roleFilter !== "ALL" && u.role_code !== roleFilter) return false;
+        if (statusFilter === "ACTIVE" && u.is_locked) return false;
+        if (statusFilter === "LOCKED" && !u.is_locked) return false;
+        if (!q) return true;
+        return (
+          (u.full_name || "").toLowerCase().includes(q) ||
+          (u.email || "").toLowerCase().includes(q) ||
+          (u.phone || "").toLowerCase().includes(q)
+        );
+      });
+
+      if (!users.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">Không có tài khoản nào khớp bộ lọc.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = users.map(u => `
+        <tr class="hover:bg-slate-800/50 transition">
+          <td class="p-3.5 font-bold text-slate-400">#${u.id}</td>
+          <td class="p-3.5 font-bold text-white">${u.full_name}</td>
+          <td class="p-3.5 text-slate-300">${u.email}</td>
+          <td class="p-3.5 text-slate-400">${u.phone || '—'}</td>
+          <td class="p-3.5">
+            <select onchange="changeUserRole(${u.id}, this.value)" class="rounded-lg bg-slate-800 border border-slate-700 px-2 py-1 text-[11px] font-bold text-purple-200">
+              ${allRolesCache.map(r => `
+                <option value="${r.id}" ${(r.id === u.role_id || r.code === u.role_code) ? 'selected' : ''}>${r.code} (${r.name})</option>
+              `).join("")}
+            </select>
+          </td>
+          <td class="p-3.5">
+            ${u.is_email_verified ? '<span class="text-emerald-400 font-bold">✓ Đã xác minh</span>' : '<span class="text-rose-400 font-bold">✗ Chưa xác minh</span>'}
+          </td>
+          <td class="p-3.5">
+            ${u.is_locked ? '<span class="px-2 py-0.5 rounded text-[10px] bg-rose-950 text-rose-300 font-bold border border-rose-800">Đã Khóa</span>' : '<span class="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 font-bold border border-emerald-800">Hoạt Động</span>'}
+          </td>
+          <td class="p-3.5 text-right space-x-1.5 whitespace-nowrap">
+            <button onclick="revokeUserSessions(${u.id})" class="px-2.5 py-1 bg-sky-950/80 hover:bg-sky-900 text-sky-300 rounded font-bold text-[10px] border border-sky-800">
+              Thu hồi phiên
+            </button>
+            ${u.is_locked ?
+              `<button onclick="unlockUser(${u.id})" class="px-2.5 py-1 bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300 rounded font-bold text-[10px] border border-emerald-700">Mở khóa</button>` :
+              `<button onclick="lockUser(${u.id})" class="px-2.5 py-1 bg-rose-950/80 hover:bg-rose-900 text-rose-300 rounded font-bold text-[10px] border border-rose-800">Khóa tài khoản</button>`
+            }
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    async function triggerExpiredVietqrOrdersAdmin() {
+      const token = localStorage.getItem('session_token');
+      const res = await fetch("/api/v1/orders/trigger-expiry-job", {
+        method: "POST",
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        notify(data.detail || "Không thể quét đơn VietQR quá hạn.", "error");
+        return;
+      }
+      notify(data.message || `Đã quét và tự động hủy ${data.expired_count || 0} đơn VietQR quá hạn!`, "success");
+      loadAuditLogs();
+    }
+
+    function getRoleBadgeClass(code) {
+      switch(code) {
+        case 'ADMIN': return 'bg-purple-900/80 text-purple-200 border border-purple-700';
+        case 'MANAGER': return 'bg-emerald-900/80 text-emerald-200 border border-emerald-700';
+        case 'WAREHOUSE': return 'bg-amber-900/80 text-amber-200 border border-amber-700';
+        case 'SALES': return 'bg-sky-900/80 text-sky-200 border border-sky-700';
+        default: return 'bg-slate-800 text-slate-300 border border-slate-700';
+      }
+    }
+
+    async function lockUser(id) {
+      if (!(await confirmDialog("Bạn có chắc chắn muốn khóa tài khoản này? Khóa tài khoản có hiệu lực ngay lập tức!"))) return;
+      const token = localStorage.getItem('session_token');
+      const res = await fetch(`/api/v1/admin/users/${id}/lock`, {
+        method: 'POST',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const data = await res.json();
+      if (!res.ok) notify(data.detail || "Lỗi khóa tài khoản", "error");
+      else { notify(data.message, "success"); loadAdminUsers(); }
+    }
+
+    async function unlockUser(id) {
+      const token = localStorage.getItem('session_token');
+      const res = await fetch(`/api/v1/admin/users/${id}/unlock`, {
+        method: 'POST',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const data = await res.json();
+      if (!res.ok) notify(data.detail || "Lỗi mở khóa", "error");
+      else { notify(data.message, "success"); loadAdminUsers(); }
+    }
+
+    async function loadPromotions() {
+      const box = document.getElementById("promotionsCards");
+      try {
+        const token = localStorage.getItem('session_token');
+        const res = await fetch("/api/v1/promotions/manage", { headers: token ? { 'Authorization': `Bearer ${token}` } : {} });
+        if (!res.ok) return;
+        const promos = await res.json();
+        box.innerHTML = promos.map(p => `
+          <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-2 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-900 text-purple-200">${p.promotion_type}</span>
+                <span class="text-xs font-black text-emerald-400">${p.discount_percent}% OFF</span>
+              </div>
+              <h4 class="font-bold text-white text-sm">${p.code}</h4>
+              <p class="text-xs text-slate-400">${p.name}</p>
+              <p class="text-[11px] text-sky-300">${p.audience || 'Tất cả khách hàng'}</p>
+            </div>
+            <div class="text-[10px] text-slate-500 pt-2 border-t border-slate-800 flex items-center justify-between">
+              <span>Đơn tối thiểu: ${new Intl.NumberFormat('vi-VN').format(p.minimum_order_amount)} đ</span>
+              <button onclick="togglePromo(${p.id})" class="px-2 py-0.5 rounded font-bold border ${p.is_active ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-rose-950 text-rose-400 border-rose-800'}">
+                ${p.is_active ? 'Đang bật (Tắt)' : 'Tạm dừng (Bật)'}
+              </button>
+            </div>
+          </div>
+        `).join("");
+      } catch (err) {}
+    }
+
+    async function togglePromo(promoId) {
+      const token = localStorage.getItem('session_token');
+      await fetch(`/api/v1/promotions/${promoId}/toggle`, {
+        method: "POST",
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      loadPromotions();
+    }
+
+    async function triggerAbandonedCartReminders() {
+      const token = localStorage.getItem('session_token');
+      const res = await fetch("/api/v1/cart/trigger-reminders?inactive_hours=24", {
+        method: "POST",
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      const data = await res.json();
+      notify(data.message || `Đã gửi ${data.reminders_triggered || 0} thông báo nhắc mua giỏ hàng!`, "success");
+    }
+
+    async function loadVoucherCustomers() {
+      try {
+        const token = localStorage.getItem('session_token');
+        const res = await fetch('/api/v1/admin/users', { headers: token ? { 'Authorization': `Bearer ${token}` } : {} });
+        if (!res.ok) return;
+        const users = (await res.json()).filter(u => u.role_code === 'CUSTOMER' && !u.is_locked);
+        document.getElementById('voucherCustomers').innerHTML = users.map(u => `<option value="${u.id}">${u.full_name} — ${u.email}</option>`).join('');
+      } catch (err) {}
+    }
+
+    function toggleVoucherCustomers() {
+      const selected = document.getElementById('voucherAudience').value === 'selected';
+      document.getElementById('voucherCustomersWrap').classList.toggle('hidden', !selected);
+    }
+
+    async function createVoucher(event) {
+      event.preventDefault();
+      const promoType = document.getElementById('promoTypeSelect').value;
+      const audience = document.getElementById('voucherAudience').value;
+      const starts = document.getElementById('voucherStarts').value, ends = document.getElementById('voucherEnds').value;
+      if (!starts || !ends || new Date(starts) >= new Date(ends)) { notify('Thời gian kết thúc cần sau thời gian bắt đầu.', 'error'); return; }
+      const selected = [...document.getElementById('voucherCustomers').selectedOptions].map(o => Number(o.value));
+      if (audience === 'selected' && !selected.length) { notify('Hãy chọn ít nhất một khách hàng.', 'error'); return; }
+      const payload = {
+        code: document.getElementById('voucherCode').value.trim().toUpperCase(),
+        name: document.getElementById('voucherName').value.trim(),
+        promotion_type: promoType,
+        discount_percent: Number(document.getElementById('voucherPercent').value),
+        minimum_order_amount: Number(document.getElementById('voucherMinimum').value || 0),
+        usage_limit: document.getElementById('voucherLimit').value ? Number(document.getElementById('voucherLimit').value) : null,
+        starts_at: new Date(starts).toISOString(),
+        ends_at: new Date(ends).toISOString(),
+        eligible_customer_ids: audience === 'selected' ? selected : null
+      };
+      const token = localStorage.getItem('session_token');
+      const res = await fetch('/api/v1/promotions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) { notify(data.detail || 'Không thể tạo chương trình khuyến mãi.', 'error'); return; }
+      notify(`Đã tạo chương trình ${data.code} thành công.`, 'success');
+      event.target.reset();
+      document.getElementById('voucherMinimum').value = '0';
+      toggleVoucherCustomers();
+      loadPromotions();
+    }
+
+    async function loadAuditLogs() {
+      const token = localStorage.getItem('session_token');
+      try {
+        const res = await fetch("/api/v1/admin/audit-logs?limit=80", {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        if (!res.ok) return;
+        auditLogsCache = await res.json();
+        renderAuditLogs();
+      } catch (err) {}
+    }
+
+    function renderAuditLogs() {
+      const tbody = document.getElementById("auditLogsTableBody");
+      if (!tbody) return;
+      const cat = document.getElementById("auditCategoryFilter")?.value || "ALL";
+      const filtered = cat === "ALL" ? auditLogsCache : auditLogsCache.filter(x => x.category === cat);
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-500">Chưa có bản ghi kiểm toán phù hợp.</td></tr>`;
+        return;
+      }
+      const badgeMap = {
+        ORDER_FLOW: 'bg-sky-950 text-sky-300 border-sky-800',
+        INVENTORY: 'bg-amber-950 text-amber-300 border-amber-800',
+        OUTBOX_AUTOMATION: 'bg-purple-950 text-purple-300 border-purple-800'
+      };
+      tbody.innerHTML = filtered.map(ev => `
+        <tr class="hover:bg-slate-800/40">
+          <td class="p-3.5 text-slate-400 font-mono text-[11px]">${new Date(ev.timestamp).toLocaleString('vi-VN')}</td>
+          <td class="p-3.5"><span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badgeMap[ev.category] || 'bg-slate-800 text-slate-300'}">${ev.category}</span></td>
+          <td class="p-3.5 font-bold text-white">${ev.title}</td>
+          <td class="p-3.5 text-slate-400 font-mono text-[11px]">${ev.detail || '—'}</td>
+        </tr>
+      `).join("");
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('session_token');
+      localStorage.removeItem('user_role');
+      localStorage.removeItem('user_name');
+      window.location.href = '/staff/login';
+    }
+  </script>
+  <script src="/static/vendor/lenis.min.js"></script>
+  <script src="/static/vendor/gsap.min.js"></script>
+  <script src="/static/vendor/ScrollTrigger.min.js"></script>
+  <script src="/static/vendor/Flip.min.js"></script>
+  <script src="/static/vendor/split-type.min.js"></script>
+  <script src="/static/js/creative-engine.js?v=cool_aqua_v2"></script>
+  <link rel="stylesheet" href="/static/css/lucky-wheel.css?v=wheel_v2">
+  <script src="/static/js/lucky-wheel-core.js?v=wheel_v2"></script>
+  <script src="/static/js/lucky-wheel-admin.js?v=wheel_v2"></script>
+  <link rel="stylesheet" href="/static/css/insights.css?v=insights_v1">
+  <script src="/static/js/insights-admin.js?v=insights_v1"></script>
+</body>
+</html>

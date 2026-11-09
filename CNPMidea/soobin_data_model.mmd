@@ -1,0 +1,547 @@
+%% Soobin Swimwear - consolidated proposed data model v1
+%% Prefixes: user_ and production_. One entity declaration per table.
+%% Common audit columns omitted, as in the original proposal.
+%% JSONB fields are validated snapshots or flexible content, not implicit foreign keys.
+%% This is a proposed model, not approved SQL DDL.
+%% Assumptions pending PRD decisions: receipt detail table, Google account linking,
+%% review eligibility, COD payment recognition, voucher restoration on delivery failure.
+%% text_array represents PostgreSQL text[]. Numeric precision is defined in SQL/spec.
+
+erDiagram
+    direction TB
+
+    %% 1. USER: identity, authentication, authorization, addresses
+
+    user_account {
+        bigint id PK
+        bigint role_id FK
+        varchar email UK
+        varchar phone UK "Nullable"
+        varchar password_hash "Nullable for Google-only account"
+        varchar full_name
+        timestamptz email_verified_at
+        boolean is_locked
+    }
+
+    user_role {
+        bigint id PK
+        varchar code UK
+        varchar name
+        boolean is_system "Protected built-in role, not an access grant"
+        boolean is_active
+    }
+
+    user_permission {
+        bigint id PK
+        varchar code UK "Example orders.confirm"
+        varchar description
+    }
+
+    user_role_permission {
+        bigint role_id PK, FK
+        bigint permission_id PK, FK
+    }
+
+    user_identity {
+        bigint id PK
+        bigint account_id FK
+        varchar provider "Google"
+        varchar provider_subject
+    }
+
+    user_session {
+        bigint id PK
+        bigint account_id FK
+        varchar session_token_hash UK
+        timestamptz expires_at
+        timestamptz revoked_at
+    }
+
+    user_action_token {
+        bigint id PK
+        bigint account_id FK
+        varchar purpose "Verify email or reset password"
+        varchar token_hash UK
+        timestamptz expires_at
+        timestamptz consumed_at
+    }
+
+    user_address {
+        bigint id PK
+        bigint account_id FK
+        varchar recipient_name
+        varchar recipient_phone
+        text address_line
+        varchar province_code
+        varchar district_code
+        varchar ward_code
+        boolean is_default
+    }
+
+    %% 2. CATALOG: products, variants, attributes, collections, images
+
+    production_product {
+        bigint id PK
+        bigint category_id FK
+        bigint product_line_id FK "Nullable"
+        varchar code UK
+        varchar slug UK
+        varchar name
+        numeric base_price
+        varchar target_audience
+        varchar skill_level
+        text description
+        text care_instructions
+        jsonb specifications
+        jsonb size_chart
+        text_array tags
+        varchar status "Selling or discontinued"
+        timestamptz deleted_at
+    }
+
+    production_variant {
+        bigint id PK
+        bigint product_id FK
+        bigint size_id FK
+        bigint color_id FK
+        varchar sku UK
+        boolean is_active
+    }
+
+    production_category {
+        bigint id PK
+        bigint parent_id FK "Nullable"
+        varchar name
+        varchar slug UK
+        int sort_order
+        boolean is_active
+    }
+
+    production_product_line {
+        bigint id PK
+        varchar code UK
+        varchar name
+        boolean is_active
+    }
+
+    production_size {
+        bigint id PK
+        varchar code UK
+        varchar name
+        int sort_order
+    }
+
+    production_color {
+        bigint id PK
+        varchar code UK
+        varchar name
+        varchar hex_code
+    }
+
+    production_material {
+        bigint id PK
+        varchar code UK
+        varchar name
+    }
+
+    production_product_material {
+        bigint product_id PK, FK
+        bigint material_id PK, FK
+    }
+
+    production_collection {
+        bigint id PK
+        varchar name
+        varchar slug UK
+        boolean is_active
+    }
+
+    production_product_collection {
+        bigint product_id PK, FK
+        bigint collection_id PK, FK
+    }
+
+    production_product_image {
+        bigint id PK
+        bigint product_id FK
+        bigint color_id FK "Nullable for common images"
+        varchar file_path
+        varchar alt_text
+        int sort_order
+    }
+
+    %% 3. INVENTORY: confirmed receipts, balances, immutable movements
+
+    production_supplier {
+        bigint id PK
+        varchar code UK
+        varchar name
+        varchar phone
+        varchar email
+        text address
+        boolean is_active
+    }
+
+    production_goods_receipt {
+        bigint id PK
+        varchar code UK
+        bigint supplier_id FK
+        bigint confirmed_by FK
+        timestamptz confirmed_at
+        jsonb supplier_snapshot
+        text note
+    }
+
+    production_goods_receipt_item {
+        bigint id PK
+        bigint receipt_id FK
+        bigint variant_id FK
+        int quantity
+        numeric unit_cost
+        jsonb variant_snapshot
+    }
+
+    production_inventory {
+        bigint variant_id PK, FK
+        int available_quantity
+        numeric inventory_value
+        int low_stock_threshold
+    }
+
+    production_inventory_movement {
+        bigint id PK
+        bigint variant_id FK
+        bigint receipt_item_id FK "Nullable"
+        bigint order_item_id FK "Nullable"
+        varchar movement_type
+        int quantity_delta
+        numeric value_delta
+        varchar event_key UK
+        timestamptz occurred_at
+    }
+
+    %% 4. COMMERCE: carts, promotions, orders, reviews
+
+    production_cart_item {
+        bigint account_id PK, FK
+        bigint variant_id PK, FK
+        int quantity
+    }
+
+    production_wishlist_item {
+        bigint account_id PK, FK
+        bigint product_id PK, FK
+    }
+
+    production_promotion {
+        bigint id PK
+        varchar code UK
+        varchar name
+        varchar promotion_type "Product or order or voucher"
+        numeric discount_percent
+        numeric minimum_order_amount
+        int usage_limit "Nullable"
+        int used_count
+        timestamptz starts_at
+        timestamptz ends_at
+        boolean is_active
+    }
+
+    production_promotion_product {
+        bigint promotion_id PK, FK
+        bigint product_id PK, FK
+    }
+
+    production_order {
+        bigint id PK
+        varchar code UK
+        bigint account_id FK
+        varchar status
+        varchar payment_method
+        varchar selected_discount_type
+        numeric subtotal
+        numeric discount_amount
+        numeric shipping_fee
+        numeric total_amount
+        numeric refund_amount "Nullable until eligible"
+        jsonb recipient_snapshot
+        jsonb store_snapshot
+        timestamptz payment_due_at
+        timestamptz placed_at
+    }
+
+    production_order_item {
+        bigint id PK
+        bigint order_id FK
+        bigint variant_id FK
+        bigint promotion_id FK "Nullable"
+        int quantity
+        numeric unit_price
+        numeric unit_cost_snapshot
+        numeric allocated_discount_amount
+        numeric line_total
+        jsonb product_snapshot
+        jsonb promotion_snapshot
+    }
+
+    production_order_discount_option {
+        bigint id PK
+        bigint order_id FK
+        bigint promotion_id FK "Nullable"
+        varchar option_type
+        boolean is_eligible
+        numeric discount_amount
+        boolean is_selected
+        jsonb calculation_snapshot
+    }
+
+    production_voucher_usage {
+        bigint id PK
+        bigint order_id FK, UK
+        bigint promotion_id FK
+        timestamptz consumed_at
+        timestamptz restored_at "Nullable"
+    }
+
+    production_order_history {
+        bigint id PK
+        bigint order_id FK
+        bigint actor_account_id FK "Nullable for system"
+        varchar event_type
+        varchar from_status
+        varchar to_status
+        text reason
+        timestamptz occurred_at
+    }
+
+    production_review {
+        bigint id PK
+        bigint account_id FK
+        bigint product_id FK
+        bigint order_item_id FK "Nullable pending review policy"
+        int rating
+        text content
+        varchar moderation_status
+        bigint moderated_by FK "Nullable"
+    }
+
+    %% 5. PAYMENTS, SHIPPING, INVOICES, INTEGRATION RELIABILITY
+
+    production_payment {
+        bigint id PK
+        bigint order_id FK, UK
+        varchar method
+        varchar status
+        numeric expected_amount
+        numeric received_amount
+        varchar external_transaction_id UK "Nullable"
+        timestamptz paid_at
+        jsonb payment_instruction_snapshot
+    }
+
+    production_shipment {
+        bigint id PK
+        bigint order_id FK, UK
+        varchar carrier
+        varchar tracking_code UK "Nullable until created"
+        varchar creation_status
+        varchar delivery_status
+        numeric shipping_fee_snapshot
+        varchar carrier_request_key UK
+        timestamptz delivered_at
+    }
+
+    production_invoice {
+        bigint id PK
+        bigint order_id FK, UK
+        varchar code UK
+        timestamptz issued_at
+        numeric subtotal
+        numeric discount_amount
+        numeric shipping_fee
+        numeric total_amount
+        jsonb customer_snapshot
+        jsonb store_snapshot
+    }
+
+    production_invoice_item {
+        bigint id PK
+        bigint invoice_id FK
+        bigint order_item_id FK, UK
+        int quantity
+        numeric unit_price
+        numeric discount_amount
+        numeric line_total
+        numeric unit_cost_snapshot
+        jsonb product_snapshot
+        jsonb promotion_snapshot
+    }
+
+    production_integration_event {
+        bigint id PK
+        bigint order_id FK "Nullable for unmatched events"
+        varchar source
+        varchar external_event_id
+        varchar event_type
+        jsonb payload
+        varchar processing_status
+        text processing_result
+        int attempt_count
+        timestamptz received_at
+        timestamptz processed_at
+    }
+
+    production_outbox_event {
+        bigint id PK
+        bigint order_id FK
+        varchar event_type
+        varchar event_key UK
+        jsonb payload
+        varchar status
+        int attempt_count
+        timestamptz next_attempt_at
+    }
+
+    production_idempotency_request {
+        bigint id PK
+        bigint account_id FK "Nullable"
+        varchar operation
+        varchar idempotency_key
+        varchar request_hash
+        varchar status
+        int response_status
+        jsonb response_body
+        timestamptz expires_at
+    }
+
+    %% 6. CONTENT AND FEEDBACK
+
+    production_content {
+        bigint id PK
+        bigint author_id FK
+        varchar content_type "Blog or static page"
+        varchar slug UK
+        varchar title
+        text body
+        varchar cover_image_path
+        varchar status
+        timestamptz published_at
+    }
+
+    production_content_block {
+        bigint id PK
+        varchar code UK
+        varchar block_type "Banner announcement community hot_keyword"
+        varchar placement
+        jsonb payload
+        int sort_order
+        boolean is_active
+        timestamptz starts_at
+        timestamptz ends_at
+    }
+
+    production_site_setting {
+        varchar key PK
+        jsonb value
+    }
+
+    production_feedback {
+        bigint id PK
+        bigint account_id FK "Nullable for guest"
+        varchar sender_name
+        varchar sender_email
+        text message
+        varchar status
+        bigint handled_by FK "Nullable"
+        timestamptz handled_at
+    }
+
+    %% RELATIONSHIPS: FK columns are named explicitly in edge labels.
+
+    user_role ||--o{ user_account : role_id
+    user_role ||--o{ user_role_permission : role_id
+    user_permission ||--o{ user_role_permission : permission_id
+    user_account ||--o{ user_identity : account_id
+    user_account ||--o{ user_session : account_id
+    user_account ||--o{ user_action_token : account_id
+    user_account ||--o{ user_address : account_id
+
+    production_category |o--o{ production_category : parent_id
+    production_category ||--o{ production_product : category_id
+    production_product_line |o--o{ production_product : product_line_id
+    production_product ||--|{ production_variant : product_id
+    production_size ||--o{ production_variant : size_id
+    production_color ||--o{ production_variant : color_id
+    production_product ||--o{ production_product_image : product_id
+    production_color |o--o{ production_product_image : color_id
+    production_product ||--o{ production_product_material : product_id
+    production_material ||--o{ production_product_material : material_id
+    production_product ||--o{ production_product_collection : product_id
+    production_collection ||--o{ production_product_collection : collection_id
+
+    production_supplier ||--o{ production_goods_receipt : supplier_id
+    user_account ||--o{ production_goods_receipt : confirmed_by
+    production_goods_receipt ||--|{ production_goods_receipt_item : receipt_id
+    production_variant ||--o{ production_goods_receipt_item : variant_id
+    production_variant ||--|| production_inventory : variant_id
+    production_variant ||--o{ production_inventory_movement : variant_id
+    production_goods_receipt_item |o--o{ production_inventory_movement : receipt_item_id
+    production_order_item |o--o{ production_inventory_movement : order_item_id
+
+    user_account ||--o{ production_cart_item : account_id
+    production_variant ||--o{ production_cart_item : variant_id
+    user_account ||--o{ production_wishlist_item : account_id
+    production_product ||--o{ production_wishlist_item : product_id
+    production_promotion ||--o{ production_promotion_product : promotion_id
+    production_product ||--o{ production_promotion_product : product_id
+    user_account ||--o{ production_order : account_id
+    production_order ||--|{ production_order_item : order_id
+    production_variant ||--o{ production_order_item : variant_id
+    production_promotion |o--o{ production_order_item : promotion_id
+    production_order ||--|{ production_order_discount_option : order_id
+    production_promotion |o--o{ production_order_discount_option : promotion_id
+    production_order ||--o| production_voucher_usage : order_id
+    production_promotion ||--o{ production_voucher_usage : promotion_id
+    production_order ||--|{ production_order_history : order_id
+    user_account |o--o{ production_order_history : actor_account_id
+    user_account ||--o{ production_review : account_id
+    user_account |o--o{ production_review : moderated_by
+    production_product ||--o{ production_review : product_id
+    production_order_item |o--o{ production_review : order_item_id
+
+    production_order ||--|| production_payment : order_id
+    production_order ||--o| production_shipment : order_id
+    production_order ||--o| production_invoice : order_id
+    production_invoice ||--|{ production_invoice_item : invoice_id
+    production_order_item ||--o| production_invoice_item : order_item_id
+    production_order |o--o{ production_integration_event : order_id
+    production_order ||--o{ production_outbox_event : order_id
+    user_account |o--o{ production_idempotency_request : account_id
+
+    user_account ||--o{ production_content : author_id
+    user_account |o--o{ production_feedback : account_id
+    user_account |o--o{ production_feedback : handled_by
+
+    %% ADDITIONAL SQL/SERVICE CONSTRAINTS (not represented by individual UK flags):
+    %% UNIQUE user_identity(provider, provider_subject).
+    %% UNIQUE production_variant(product_id, size_id, color_id).
+    %% UNIQUE production_order_discount_option(order_id, option_type).
+    %% At most one selected discount option per order.
+    %% UNIQUE production_integration_event(source, external_event_id).
+    %% Idempotency key uniqueness includes caller scope and operation; define NULL handling.
+    %% At most one default address per account.
+    %% System roles cannot be deleted or disabled; protect the last active Admin.
+    %% Account/role/permission checks apply on each authenticated request.
+    %% Receipt header/details exist only after confirmation; no draft rows.
+    %% Inventory movements and balances are committed in the same transaction.
+    %% Movement source must match movement_type; receipt/order references are not both set.
+    %% Inventory quantity >= 0; zero quantity has zero remaining inventory value.
+    %% Receipt/order/cart quantities > 0; monetary values >= 0 except signed movement deltas.
+    %% Promotion percent >= 0 and < 100; start < end; review rating from 1 through 5.
+    %% Use FREESIZE and NO_COLOR lookup rows for default variants.
+    %% No automatic restocking for delivery failure or refund completion.
+    %% Order cancellation restores the original quantity and cost snapshot exactly once.
+    %% Snapshot fields remain unchanged when catalog/account/promotion data changes.
+    %% Refund lifecycle uses order.status and order_history; no separate refund table in v1.
+    %% Invoices are issued only for delivered orders; one invoice per order.
+    %% Referential history is retained; do not cascade-delete historical transactions.

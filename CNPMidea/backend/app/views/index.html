@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="ocean-luxury">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOOBIN SWIMWEAR — Luxury Resort & Pro Swimwear Atelier</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/static/vendor/lenis.css">
+  <link rel="stylesheet" href="/static/css/creative-ui.css?v=cool_v5">
+  <link rel="stylesheet" href="/static/css/storefront-motion.css?v=ocean_v7">
+  <link rel="stylesheet" href="/static/css/lucky-wheel.css?v=wheel_v4">
+  <link rel="stylesheet" href="/static/css/storefront-plus.css?v=plus_v1">
+  <script defer src="/static/js/ui.js"></script>
+  <script defer src="/static/js/live-sync.js"></script>
+  <style>
+    :root, [data-theme="ocean-luxury"] {
+      --bg-primary: #f0f9ff;
+      --bg-surface: #ffffff;
+      --bg-glass: rgba(255, 255, 255, 0.96);
+      --text-primary: #0f172a;
+      --text-muted: #475569;
+      --accent-primary: #0284c7;
+      --accent-secondary: #0d9488;
+      --accent-glow: rgba(2, 132, 199, 0.12);
+      --border-subtle: #bae6fd;
+      --hero-bg: #0c4a6e;
+      --font-heading: 'Plus Jakarta Sans', sans-serif;
+    }
+    [data-theme="sunset-ibiza"] {
+      --bg-primary: #fafaf9;
+      --bg-surface: #ffffff;
+      --bg-glass: rgba(255, 255, 255, 0.96);
+      --text-primary: #1c1917;
+      --text-muted: #78716c;
+      --accent-primary: #ea580c;
+      --accent-secondary: #ea580c;
+      --accent-glow: rgba(234, 88, 12, 0.16);
+      --border-subtle: #e7e5e4;
+      --hero-bg: #1c1917;
+      --font-heading: 'Cormorant Garamond', serif;
+    }
+    [data-theme="midnight-vogue"] {
+      --bg-primary: #0f172a;
+      --bg-surface: #1e293b;
+      --bg-glass: rgba(15, 23, 42, 0.96);
+      --text-primary: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-primary: #38bdf8;
+      --accent-secondary: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --border-subtle: #334155;
+      --hero-bg: #020617;
+      --font-heading: 'Plus Jakarta Sans', sans-serif;
+    }
+    [data-theme="minimal-atelier"] {
+      --bg-primary: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-glass: rgba(255, 255, 255, 0.96);
+      --text-primary: #18181b;
+      --text-muted: #71717a;
+      --accent-primary: #18181b;
+      --accent-secondary: #18181b;
+      --accent-glow: rgba(24, 24, 27, 0.12);
+      --border-subtle: #e4e4e7;
+      --hero-bg: #18181b;
+      --font-heading: 'Cormorant Garamond', serif;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color 0.65s cubic-bezier(0.22, 1, 0.36, 1), color 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+      overflow-x: hidden;
+    }
+
+    /* PowerPoint Morph & View Transition Engine */
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation-duration: 0.65s;
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .morph-transition {
+      transition: all 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform, opacity, border-radius, width, height;
+    }
+
+    .theme-surface {
+      background-color: var(--bg-surface);
+      border-color: var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    .theme-glass {
+      background: var(--bg-glass);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-color: var(--border-subtle);
+    }
+
+    /* 3D Perspective & Interactive Card Engine */
+    .stage-3d {
+      perspective: 1400px;
+      transform-style: preserve-3d;
+    }
+
+    .card-3d {
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .card-3d:hover {
+      box-shadow: 0 28px 60px -15px var(--accent-glow), 0 0 0 1px var(--accent-primary);
+    }
+
+    .card-3d .card-glare {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at var(--glare-x, 50%) var(--glare-y, 30%), rgba(255,255,255,0.38), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      z-index: 15;
+    }
+    .card-3d:hover .card-glare {
+      opacity: 1;
+    }
+
+    .card-3d-layer {
+      transform: translateZ(26px);
+    }
+
+    /* Floating 3D Hero Stack */
+    @keyframes float-3d-slow {
+      0%, 100% { transform: rotateY(-12deg) rotateX(6deg) translateY(0px) translateZ(20px); }
+      50% { transform: rotateY(-4deg) rotateX(-4deg) translateY(-14px) translateZ(45px); }
+    }
+    .hero-3d-showcase {
+      animation: float-3d-slow 7s ease-in-out infinite;
+      transform-style: preserve-3d;
+    }
+
+    /* Announcement Marquee */
+    .announcement-track { display:flex; width:max-content; animation:announcement-scroll 28s linear infinite; }
+    .announcement-track:hover { animation-play-state:paused; }
+    .announcement-track span { padding-inline:3.5rem; white-space:nowrap; }
+    @keyframes announcement-scroll { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+
+    /* Morphing Blob Orbs */
+    @keyframes morph-blob {
+      0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(0deg) scale(1); }
+      50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: rotate(180deg) scale(1.08); }
+    }
+    .morph-orb {
+      animation: morph-blob 14s ease-in-out infinite;
+    }
+
+    /* 3D Spatial Showroom & Hologram Multi-Layer Engine */
+    .spatial-stage-viewport {
+      perspective: 1600px;
+      transform-style: preserve-3d;
+      user-select: none;
+      touch-action: none;
+    }
+    .spatial-hologram-rig {
+      transform-style: preserve-3d;
+      transition: transform 0.08s linear;
+      will-change: transform;
+    }
+    .spatial-layer-back {
+      transform: translateZ(-75px) scale(0.92);
+    }
+    .spatial-layer-pedestal {
+      transform: rotateX(76deg) translateZ(-95px);
+      transform-style: preserve-3d;
+    }
+    .spatial-layer-garment {
+      transform: translateZ(38px);
+      filter: drop-shadow(0 28px 38px rgba(0, 0, 0, 0.55));
+    }
+    .spatial-layer-front {
+      transform: translateZ(88px);
+    }
+    @keyframes pulse-ring-3d {
+      0%, 100% { transform: scale(1); opacity: 0.75; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+    .pedestal-ring-glow {
+      animation: pulse-ring-3d 3.5s ease-in-out infinite;
+    }
+    @keyframes morph-flip-in {
+      0% { opacity: 0; transform: perspective(1200px) rotateY(-18deg) scale(0.92) translateY(18px); }
+      100% { opacity: 1; transform: perspective(1200px) rotateY(0deg) scale(1) translateY(0); }
+    }
+    .morph-card-enter {
+      animation: morph-flip-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen" data-view="home">
+
+  <!-- Top Announcement Bar -->
+  <div id="top-announcement" class="overflow-hidden bg-sky-900 py-2 text-xs font-semibold text-white border-b border-sky-800">
+    <div class="announcement-track" aria-label="Thông báo khuyến mãi">
+      <span id="announcementText">🌊 Chào Hè Mát Lạnh: Nhập mã SOOBIN15 giảm ngay 15% | Đơn từ 500k giảm 10% tự động</span>
+      <span id="announcementTextClone" aria-hidden="true">🌊 Chào Hè Mát Lạnh: Nhập mã SOOBIN15 giảm ngay 15% | Đơn từ 500k giảm 10% tự động</span>
+    </div>
+  </div>
+
+  <!-- Sticky Navigation Bar -->
+  <header class="site-header sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-sky-100 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      <!-- Brand Logo -->
+      <a href="#/" class="flex items-center gap-2.5 group" aria-label="Soobin Swimwear - Trang chủ">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center text-white shadow-sm shadow-sky-500/30 group-hover:rotate-[-6deg] transition-transform">
+          <i data-lucide="waves" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <span class="text-xl font-black tracking-tight text-slate-900">SOOBIN</span>
+          <span class="text-[10px] font-bold block text-sky-600 -mt-1 tracking-widest uppercase">Aquatic &amp; Resort</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="hidden lg:flex items-center gap-1 text-[13px] font-bold text-slate-700" aria-label="Danh mục">
+        <a href="#/shop/do-boi-nu" data-route="do-boi-nu" class="nav-link category-pill-btn">Đồ Bơi Nữ</a>
+        <a href="#/shop/do-boi-nam" data-route="do-boi-nam" class="nav-link category-pill-btn">Đồ Bơi Nam</a>
+        <a href="#/shop/phu-kien-boi-loi" data-route="phu-kien-boi-loi" class="nav-link category-pill-btn">Phụ Kiện</a>
+        <a href="#/shop/do-boi-tre-em" data-route="do-boi-tre-em" class="nav-link category-pill-btn">Trẻ Em</a>
+        <a href="#/shop/sale" data-route="sale" class="nav-link nav-link-sale category-pill-btn">
+          <i data-lucide="flame" class="w-3.5 h-3.5"></i> Sale
+        </a>
+      </nav>
+
+      <!-- Search + Audio SFX Toggle + Customer Actions -->
+      <div class="flex items-center gap-2">
+        <button type="button" id="sfxToggleBtn" onclick="window.toggleSoobinSoundEffects && window.toggleSoobinSoundEffects()"
+                class="hidden 2xl:inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-sky-50 border border-sky-200 text-sky-800 hover:bg-sky-100 text-[11px] font-bold transition">
+          <span>🔊 Âm thanh: Bật</span>
+        </button>
+
+        <div class="relative hidden sm:block w-44 lg:w-52">
+          <input type="text" id="searchInput" placeholder="Tìm bikini, jammer, kính..." autocomplete="off"
+                 class="w-full pl-8 pr-9 py-1.5 text-xs bg-sky-50/70 text-slate-800 border border-sky-200 rounded-full focus:bg-white focus:border-sky-600 focus:outline-none transition">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-sky-500 absolute left-3 top-2"></i>
+          <button type="button" class="sp-visual-btn" data-visual-search title="Tìm bằng hình ảnh" aria-label="Tìm bằng hình ảnh">
+            <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <!-- Customer Profile / Login Button (Strictly for Customers -> /login) -->
+        <div id="authButtonContainer">
+          <a href="/login" class="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold bg-sky-600 text-white hover:bg-sky-700 rounded-full transition">
+            <i data-lucide="user" class="w-4 h-4"></i> Đăng Nhập
+          </a>
+        </div>
+
+        <button onclick="openWishlistModal()" title="Danh sách yêu thích" class="relative p-2 text-slate-700 hover:text-rose-600 bg-sky-50 hover:bg-rose-50 rounded-full transition">
+          <i data-lucide="heart" class="w-5 h-5"></i>
+          <span id="wishlistBadge" class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center ring-2 ring-white hidden">0</span>
+        </button>
+
+        <button onclick="toggleCartDrawer()" title="Giỏ hàng" class="relative p-2 text-slate-700 hover:text-sky-600 bg-sky-50 hover:bg-sky-100 rounded-full transition">
+          <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+          <span id="cartBadge" class="absolute -top-1 -right-1 bg-sky-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center ring-2 ring-white">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile category bar -->
+    <nav class="mobile-cat-bar lg:hidden" aria-label="Danh mục (di động)">
+      <a href="#/shop/do-boi-nu" data-route="do-boi-nu" class="nav-link category-pill-btn">Đồ Bơi Nữ</a>
+      <a href="#/shop/do-boi-nam" data-route="do-boi-nam" class="nav-link category-pill-btn">Đồ Bơi Nam</a>
+      <a href="#/shop/phu-kien-boi-loi" data-route="phu-kien-boi-loi" class="nav-link category-pill-btn">Phụ Kiện</a>
+      <a href="#/shop/do-boi-tre-em" data-route="do-boi-tre-em" class="nav-link category-pill-btn">Trẻ Em</a>
+      <a href="#/shop/sale" data-route="sale" class="nav-link nav-link-sale category-pill-btn">🔥 Sale</a>
+    </nav>
+  </header>
+
+  <!-- ==========================================================================
+       HOME VIEW — trang chủ chỉ để trình diễn (zoom in / zoom out khi cuộn)
+       ========================================================================== -->
+  <div id="homeView">
+
+    <!-- 1. COVER — biển Three.js + quạt sản phẩm hot; cuộn để "lặn" xuống biển -->
+    <section id="storeCover" class="relative overflow-hidden">
+      <div class="cover-sky" aria-hidden="true">
+        <img src="/static/images/illustrations/sun.svg" class="cover-sun" alt="">
+        <img src="/static/images/illustrations/cloud.svg" class="cover-cloud cover-cloud-a" alt="">
+        <img src="/static/images/illustrations/cloud.svg" class="cover-cloud cover-cloud-b" alt="">
+        <img src="/static/images/illustrations/seagulls.svg" class="cover-gulls" alt="">
+      </div>
+      <canvas id="oceanCanvas" aria-hidden="true"></canvas>
+      <div id="coverDiveShade" class="cover-dive-shade" aria-hidden="true"></div>
+      <div id="coverDiveCaption" class="cover-dive-caption" aria-hidden="true">
+        <strong>Lặn sâu hơn một chút…</strong>
+        <span>Những mẫu hot nhất đang chờ bạn</span>
+      </div>
+
+      <div class="cover-inner max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 relative">
+        <div id="coverTextCol" class="lg:col-span-6 space-y-5 text-center lg:text-left">
+          <span data-cover-intro class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 backdrop-blur border border-white shadow-sm text-[11px] font-extrabold uppercase tracking-widest text-sky-800">
+            <span class="cover-eyebrow-dot"></span> Bộ Sưu Tập Hè 2026
+          </span>
+
+          <h1 id="coverHeadline" class="cover-headline">
+            <span class="split-line block">Bơi Nhanh Hơn.</span>
+            <span class="split-line block"><span class="cover-headline-accent">Tỏa Sáng</span> Hơn.</span>
+          </h1>
+
+          <p data-cover-intro class="text-slate-600 text-sm sm:text-base max-w-lg mx-auto lg:mx-0 leading-relaxed">
+            Đồ bơi thi đấu, bikini nghỉ dưỡng &amp; phụ kiện bơi lội chính hãng — kháng Clo, chống UV UPF 50+.
+          </p>
+
+          <div data-cover-intro class="flex flex-wrap items-center justify-center lg:justify-start gap-3">
+            <a href="#/shop/do-boi-nu" data-magnetic data-sfx-select
+               class="btn-shine px-6 py-3.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold uppercase tracking-wider shadow-lg shadow-sky-600/30 transition-colors">
+              Mua Đồ Bơi Nữ
+            </a>
+            <a href="#/shop/do-boi-nam" data-magnetic data-sfx-select
+               class="px-6 py-3.5 rounded-full bg-white/90 backdrop-blur border border-white text-sky-900 hover:bg-white text-xs font-extrabold uppercase tracking-wider shadow-lg shadow-sky-900/10 transition-colors">
+              Mua Đồ Bơi Nam
+            </a>
+          </div>
+
+          <div data-cover-intro class="cover-stats">
+            <span><strong><span data-count-to="0" id="coverStatProducts">0</span>+</strong> mẫu</span>
+            <span><strong><span data-count-to="0" id="coverStatSold">0</span></strong> đã bán</span>
+            <span class="text-rose-600"><strong>-<span data-count-to="0" id="coverStatDiscount">0</span>%</strong> <span id="coverSaleCtaLabel">sale</span></span>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6">
+          <div id="coverStage" class="cover-stage">
+            <div id="coverCards"></div>
+            <div id="coverChipSold" class="cover-floating-chip hidden" style="left: 2%; top: 12%;">🔥 <span id="coverChipSoldText">Bán chạy nhất tuần</span></div>
+            <div id="coverChipRating" class="cover-floating-chip hidden" style="right: 0%; bottom: 14%;">⭐ <span id="coverChipRatingText">Được yêu thích</span></div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="cover-scroll-hint" onclick="window.soobinMotion && window.soobinMotion.scrollToId('showcaseHot')" aria-label="Cuộn xuống">
+        <span class="cover-scroll-mouse"><span></span></span>
+        Cuộn để lặn xuống
+      </button>
+    </section>
+
+    <!-- 2. PINNED HORIZONTAL SHOWCASE — HOT + TRENDING (dưới mặt nước) -->
+    <section id="showcaseHot" class="relative overflow-hidden">
+      <div class="sc-underwater" aria-hidden="true">
+        <span class="sc-ray sc-ray-a"></span><span class="sc-ray sc-ray-b"></span><span class="sc-ray sc-ray-c"></span>
+        <span class="sc-bubble" style="left:6%;--d:11s;--s:10px"></span>
+        <span class="sc-bubble" style="left:18%;--d:14s;--s:6px;animation-delay:-4s"></span>
+        <span class="sc-bubble" style="left:37%;--d:12s;--s:8px;animation-delay:-7s"></span>
+        <span class="sc-bubble" style="left:58%;--d:16s;--s:12px;animation-delay:-2s"></span>
+        <span class="sc-bubble" style="left:74%;--d:13s;--s:7px;animation-delay:-9s"></span>
+        <span class="sc-bubble" style="left:90%;--d:15s;--s:9px;animation-delay:-5s"></span>
+      </div>
+      <div class="showcase-pin-inner relative">
+        <div class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <span class="text-[11px] font-extrabold uppercase tracking-[0.25em] text-cyan-300">Soobin Showcase</span>
+            <h2 id="showcaseModeTitle" class="text-3xl sm:text-4xl font-black tracking-tight mt-1">Đang Hot Nhất</h2>
+            <p id="showcaseModeDesc" class="text-sm text-sky-100/70 mt-1">Những mẫu được khách hàng chọn mua nhiều nhất.</p>
+          </div>
+          <div class="flex flex-col items-start md:items-end gap-3 w-full md:w-80">
+            <div class="flex items-center gap-2 text-[11px] font-extrabold">
+              <span id="scPillHot" class="sc-mode-pill is-active px-3 py-1.5 rounded-full border border-sky-300/30">🔥 Bán chạy</span>
+              <span id="scPillTrend" class="sc-mode-pill px-3 py-1.5 rounded-full border border-sky-300/30 text-sky-100">📈 Trending</span>
+              <span id="scCounter" class="ml-1 font-mono text-sky-200/80">01 / 01</span>
+            </div>
+            <div class="sc-progress w-full"><span id="scProgressBar"></span></div>
+          </div>
+        </div>
+
+        <div id="showcaseViewport" class="relative">
+          <div id="showcaseTrack" class="showcase-track">
+            <div class="sc-panel-intro py-6 text-sky-100/80 text-sm">
+              <i data-lucide="loader-2" class="w-6 h-6 animate-spin text-cyan-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. BEACH ZOOM — cửa sổ tròn mở rộng, cảnh biển zoom-out nhiều lớp -->
+    <section id="beachZoom" class="relative overflow-hidden" aria-label="Từ hồ bơi đến bãi biển">
+      <div class="bz-stage">
+        <div id="bzIntro" class="bz-intro">
+          <span class="text-[11px] font-extrabold uppercase tracking-[0.3em] text-cyan-300">Soobin Summer Story</span>
+          <h2 class="bz-intro-title">Từ <em>làn bơi thi đấu</em><br>đến <em>bãi biển nhiệt đới</em></h2>
+        </div>
+
+        <div id="bzWindow" class="bz-window">
+          <div class="bz-sky"></div>
+          <img src="/static/images/illustrations/sun.svg" class="bz-layer bz-sun" data-depth="2.4" alt="">
+          <img src="/static/images/illustrations/cloud.svg" class="bz-layer bz-cloud-a" data-depth="1.9" alt="">
+          <img src="/static/images/illustrations/cloud.svg" class="bz-layer bz-cloud-b" data-depth="1.7" alt="">
+          <img src="/static/images/illustrations/seagulls.svg" class="bz-layer bz-gulls" data-depth="2.0" alt="">
+
+          <svg class="bz-layer bz-sea" data-depth="1.35" viewBox="0 0 1440 420" preserveAspectRatio="none" aria-hidden="true">
+            <g class="bz-wave bz-wave-back"><path d="M0 70 Q 90 40 180 70 T 360 70 T 540 70 T 720 70 T 900 70 T 1080 70 T 1260 70 T 1440 70 T 1620 70 T 1800 70 T 1980 70 T 2160 70 T 2340 70 T 2520 70 T 2700 70 T 2880 70 V420 H0Z" fill="#38bdf8"/></g>
+            <g class="bz-wave bz-wave-mid"><path d="M0 130 Q 120 96 240 130 T 480 130 T 720 130 T 960 130 T 1200 130 T 1440 130 T 1680 130 T 1920 130 T 2160 130 T 2400 130 T 2640 130 T 2880 130 V420 H0Z" fill="#0ea5e9"/></g>
+            <g class="bz-wave bz-wave-front"><path d="M0 200 Q 80 176 160 200 T 320 200 T 480 200 T 640 200 T 800 200 T 960 200 T 1120 200 T 1280 200 T 1440 200 T 1600 200 T 1760 200 T 1920 200 T 2080 200 T 2240 200 T 2400 200 T 2560 200 T 2720 200 T 2880 200 V420 H0Z" fill="#0284c7"/></g>
+          </svg>
+          <img src="/static/images/illustrations/swimmer.svg" class="bz-layer bz-swimmer" data-depth="1.5" alt="">
+
+          <svg class="bz-layer bz-sand" data-depth="1.18" viewBox="0 0 1440 300" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 120 C 240 60, 520 40, 760 90 C 980 136, 1220 96, 1440 60 V300 H0Z" fill="#fde68a"/>
+            <path d="M0 120 C 240 60, 520 40, 760 90 C 980 136, 1220 96, 1440 60" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.7"/>
+            <path d="M0 170 C 300 130, 600 120, 900 160 C 1100 186, 1300 160, 1440 140 V300 H0Z" fill="#fcd34d" opacity="0.55"/>
+          </svg>
+          <img src="/static/images/illustrations/palm.svg" class="bz-layer bz-palm" data-depth="1.9" alt="">
+          <img src="/static/images/illustrations/umbrella.svg" class="bz-layer bz-umbrella" data-depth="1.7" alt="">
+          <img src="/static/images/illustrations/surfboard.svg" class="bz-layer bz-surf" data-depth="1.6" alt="">
+          <img src="/static/images/illustrations/beachball.svg" class="bz-layer bz-ball" data-depth="1.8" alt="">
+          <img src="/static/images/illustrations/starfish.svg" class="bz-layer bz-star" data-depth="2.1" alt="">
+          <img src="/static/images/illustrations/shell.svg" class="bz-layer bz-shell" data-depth="2.0" alt="">
+
+          <div id="bzCopy" class="bz-copy">
+            <h3>Mùa hè của bạn bắt đầu tại đây</h3>
+            <p>Chọn bộ sưu tập phù hợp — giao nhanh toàn quốc, đổi size dễ dàng.</p>
+            <div class="flex flex-wrap justify-center gap-2.5 mt-5">
+              <a href="#/shop/do-boi-nu" data-sfx-select class="bz-btn bz-btn-primary">Đồ Bơi Nữ</a>
+              <a href="#/shop/do-boi-nam" data-sfx-select class="bz-btn">Đồ Bơi Nam</a>
+              <a href="#/shop/phu-kien-boi-loi" data-sfx-select class="bz-btn">Phụ Kiện</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. CATEGORY PORTALS — Nữ / Nam / Phụ kiện (zoom-in khi cuộn tới) -->
+    <section id="homeCategories" class="cat-section relative overflow-hidden">
+      <img src="/static/images/illustrations/starfish.svg" class="cat-decor cat-decor-a" data-parallax="-60" alt="" aria-hidden="true">
+      <img src="/static/images/illustrations/shell.svg" class="cat-decor cat-decor-b" data-parallax="80" alt="" aria-hidden="true">
+      <img src="/static/images/illustrations/buoy.svg" class="cat-decor cat-decor-c" data-parallax="-110" alt="" aria-hidden="true">
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div class="text-center max-w-2xl mx-auto mb-10 lg:mb-14" data-zoom-reveal>
+          <span class="text-[11px] font-extrabold uppercase tracking-[0.3em] text-sky-600">Chọn phong cách của bạn</span>
+          <h2 data-split-heading class="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 mt-2">Ba Thế Giới Dưới Nước</h2>
+        </div>
+
+        <div id="catGrid" class="cat-grid">
+          <a href="#/shop/do-boi-nu" class="cat-tile category-pill-btn" data-cursor-label="Khám phá →">
+            <div class="cat-tile-media"><img src="/static/images/swim-w02-coral.jpg" alt="Đồ bơi nữ" loading="lazy"></div>
+            <div class="cat-tile-shade"></div>
+            <img src="/static/images/illustrations/umbrella.svg" class="cat-tile-illus" alt="" aria-hidden="true">
+            <div class="cat-tile-body">
+              <span class="cat-tile-kicker">01 — Resort &amp; Biển</span>
+              <h3>Đồ Bơi Nữ</h3>
+              <p>Bikini · Một mảnh · Rash guard</p>
+              <span class="cat-tile-cta">Khám phá <i data-lucide="arrow-up-right" class="w-4 h-4"></i></span>
+            </div>
+          </a>
+          <a href="#/shop/do-boi-nam" class="cat-tile category-pill-btn" data-cursor-label="Khám phá →">
+            <div class="cat-tile-media"><img src="/static/images/products/swim_men_jammer_navy.jpg" alt="Đồ bơi nam" loading="lazy"></div>
+            <div class="cat-tile-shade"></div>
+            <img src="/static/images/illustrations/medal.svg" class="cat-tile-illus" alt="" aria-hidden="true">
+            <div class="cat-tile-body">
+              <span class="cat-tile-kicker">02 — Thi đấu &amp; Thể thao</span>
+              <h3>Đồ Bơi Nam</h3>
+              <p>Jammer · Boardshort · Boxer</p>
+              <span class="cat-tile-cta">Khám phá <i data-lucide="arrow-up-right" class="w-4 h-4"></i></span>
+            </div>
+          </a>
+          <a href="#/shop/phu-kien-boi-loi" class="cat-tile category-pill-btn" data-cursor-label="Khám phá →">
+            <div class="cat-tile-media"><img src="/static/images/products/swim_gear_goggles_cyan.jpg" alt="Phụ kiện bơi lội" loading="lazy"></div>
+            <div class="cat-tile-shade"></div>
+            <img src="/static/images/illustrations/goggles.svg" class="cat-tile-illus" alt="" aria-hidden="true">
+            <div class="cat-tile-body">
+              <span class="cat-tile-kicker">03 — Kính · Mũ · Chân vịt</span>
+              <h3>Phụ Kiện</h3>
+              <p>Kính bơi · Túi chống nước · Dụng cụ</p>
+              <span class="cat-tile-cta">Khám phá <i data-lucide="arrow-up-right" class="w-4 h-4"></i></span>
+            </div>
+          </a>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-3 mt-8 text-xs font-extrabold">
+          <a href="#/shop/do-boi-tre-em" class="category-pill-btn px-4 py-2 rounded-full bg-white border border-sky-200 text-sky-800 hover:bg-sky-50 transition">Đồ bơi trẻ em →</a>
+          <a href="#/shop/all" class="category-pill-btn px-4 py-2 rounded-full bg-slate-900 text-white hover:bg-slate-800 transition">Xem tất cả sản phẩm →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lucky Wheel teaser — vòng quay may mắn nhận voucher riêng -->
+    <section id="luckyWheelTeaser" aria-label="Vòng quay may mắn">
+      <img src="/static/images/illustrations/starfish.svg" class="lwt-confetti" data-parallax="-80" style="width:54px;left:6%;top:14%" alt="" aria-hidden="true">
+      <img src="/static/images/illustrations/beachball.svg" class="lwt-confetti" data-parallax="90" style="width:64px;right:5%;bottom:12%" alt="" aria-hidden="true">
+      <img src="/static/images/illustrations/fish.svg" class="lwt-confetti" data-parallax="-50" style="width:70px;left:46%;bottom:8%;opacity:.55" alt="" aria-hidden="true">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="lwt-grid">
+          <div class="lwt-wheel" data-zoom-reveal="in"><div id="lwTeaserWheel"></div></div>
+          <div data-zoom-reveal>
+            <span class="lw-eyebrow">Soobin Lucky Wheel</span>
+            <h2 id="lwtTitle" class="lw-title" style="font-size:clamp(2.2rem,4.6vw,3.6rem)">Vòng Quay Đại Dương</h2>
+            <p id="lwtSub" class="lw-sub">Quay là trúng — voucher riêng chỉ dành cho bạn!</p>
+            <div id="lwtChips" class="lw-chips"></div>
+            <div class="flex flex-wrap gap-3 mt-7">
+              <button type="button" data-open-wheel data-magnetic class="lw-spin-btn" style="width:auto;margin-top:0;padding:1rem 2rem">🎡 QUAY NGAY</button>
+            </div>
+            <p class="text-xs text-sky-200/70 mt-4">Mỗi voucher trúng thưởng là mã riêng của bạn, dùng 1 lần khi thanh toán.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust Marquee -->
+    <div class="trust-band">
+      <div class="soobin-marquee text-[12px] font-extrabold text-sky-50 uppercase tracking-wider">
+        <div class="soobin-marquee-track">
+          <span class="flex items-center gap-2"><i data-lucide="badge-check" class="w-4 h-4 text-cyan-300"></i> Chính hãng 100%</span>
+          <span class="flex items-center gap-2"><i data-lucide="sun" class="w-4 h-4 text-amber-300"></i> Chống UV UPF 50+</span>
+          <span class="flex items-center gap-2"><i data-lucide="droplets" class="w-4 h-4 text-cyan-300"></i> Kháng Clo hồ bơi</span>
+          <span class="flex items-center gap-2"><i data-lucide="repeat" class="w-4 h-4 text-emerald-300"></i> Đổi size dễ dàng</span>
+          <span class="flex items-center gap-2"><i data-lucide="truck" class="w-4 h-4 text-cyan-300"></i> Giao GHTK toàn quốc</span>
+          <span class="flex items-center gap-2"><i data-lucide="qr-code" class="w-4 h-4 text-white"></i> COD &amp; VietQR</span>
+        </div>
+        <div class="soobin-marquee-track" aria-hidden="true">
+          <span class="flex items-center gap-2"><i data-lucide="badge-check" class="w-4 h-4 text-cyan-300"></i> Chính hãng 100%</span>
+          <span class="flex items-center gap-2"><i data-lucide="sun" class="w-4 h-4 text-amber-300"></i> Chống UV UPF 50+</span>
+          <span class="flex items-center gap-2"><i data-lucide="droplets" class="w-4 h-4 text-cyan-300"></i> Kháng Clo hồ bơi</span>
+          <span class="flex items-center gap-2"><i data-lucide="repeat" class="w-4 h-4 text-emerald-300"></i> Đổi size dễ dàng</span>
+          <span class="flex items-center gap-2"><i data-lucide="truck" class="w-4 h-4 text-cyan-300"></i> Giao GHTK toàn quốc</span>
+          <span class="flex items-center gap-2"><i data-lucide="qr-code" class="w-4 h-4 text-white"></i> COD &amp; VietQR</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. FLASH SALE — drag rail + countdown thật -->
+    <section id="flashSaleSection" class="relative bg-white py-14 lg:py-20 hidden">
+      <img src="/static/images/illustrations/beachball.svg" class="fs-decor" data-parallax="-70" alt="" aria-hidden="true">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-6" data-zoom-reveal>
+        <div>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-600 text-[11px] font-extrabold uppercase tracking-wider">
+            <i data-lucide="zap" class="w-3.5 h-3.5"></i> Flash Sale
+          </span>
+          <h2 data-split-heading class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 mt-2">
+            Giảm Sâu Đến <span class="text-rose-600">-<span id="saleMaxPct">0</span>%</span>
+          </h2>
+        </div>
+        <div class="flex flex-wrap items-center gap-4">
+          <div id="saleCountdownWrap" class="hidden items-center gap-2">
+            <span class="text-[11px] font-extrabold uppercase text-slate-500">Kết thúc sau</span>
+            <span class="countdown-cell" id="cdDays">00</span><span class="font-black text-slate-400">:</span>
+            <span class="countdown-cell" id="cdHours">00</span><span class="font-black text-slate-400">:</span>
+            <span class="countdown-cell" id="cdMins">00</span><span class="font-black text-slate-400">:</span>
+            <span class="countdown-cell" id="cdSecs">00</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="window.soobinMotion && window.soobinMotion.nudgeSaleRail(-1)" aria-label="Trước"
+                    class="w-11 h-11 rounded-full border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center transition">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            </button>
+            <button type="button" onclick="window.soobinMotion && window.soobinMotion.nudgeSaleRail(1)" aria-label="Sau"
+                    class="w-11 h-11 rounded-full bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-center transition">
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+            <a href="#/shop/sale" class="category-pill-btn px-4 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold transition">
+              Xem tất cả
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div id="saleRail" class="sale-rail" data-cursor-label="⟷ Kéo"></div>
+    </section>
+
+    <!-- 6. COMBO LOOKBOOK -->
+    <section id="lookbookBundlesSection" class="relative py-14 lg:py-20 bg-sky-50/60">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3" data-zoom-reveal>
+          <div>
+            <span class="text-[11px] font-extrabold uppercase tracking-[0.3em] text-sky-600">Combo đồng bộ</span>
+            <h2 data-split-heading class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 mt-2">Phối Sẵn Theo Set</h2>
+          </div>
+        </div>
+        <div id="lookbookBundlesGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-6" data-zoom-reveal="in"></div>
+      </div>
+    </section>
+
+    <!-- 7. WHY SOOBIN -->
+    <section id="whySoobin" class="relative py-14 lg:py-20 bg-white overflow-hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-10" data-zoom-reveal>
+          <span class="text-[11px] font-extrabold uppercase tracking-[0.3em] text-sky-600">Vì sao chọn Soobin</span>
+          <h2 data-split-heading class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 mt-2">Sinh Ra Cho Mặt Nước</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" data-zoom-stagger>
+          <div class="why-card">
+            <img src="/static/images/illustrations/medal.svg" alt="" aria-hidden="true">
+            <h3>Chuẩn Thi Đấu</h3>
+            <p>Giảm lực cản dòng nước, đường may Flatlock không cấn khi sải tay.</p>
+          </div>
+          <div class="why-card">
+            <img src="/static/images/illustrations/sun.svg" alt="" aria-hidden="true">
+            <h3>UPF 50+ &amp; Kháng Clo</h3>
+            <p>Vải Carvico Ý co giãn 4 chiều, bền màu dưới nắng biển và nước hồ bơi.</p>
+          </div>
+          <div class="why-card">
+            <img src="/static/images/illustrations/buoy.svg" alt="" aria-hidden="true">
+            <h3>Đổi Size &amp; Bảo Hành</h3>
+            <p>Đổi size khi còn tem mác, bảo hành đường may và khoá kéo chống muối biển.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==========================================================================
+       SHOP VIEW — lưới sản phẩm theo danh mục (không có hiệu ứng zoom)
+       ========================================================================== -->
+  <div id="shopView" hidden>
+    <section class="shop-hero relative overflow-hidden">
+      <img src="/static/images/illustrations/seagulls.svg" class="shop-decor shop-decor-gulls" alt="" aria-hidden="true">
+      <img id="shopIllus" src="/static/images/illustrations/goggles.svg" class="shop-decor shop-decor-main" alt="" aria-hidden="true">
+      <img src="/static/images/illustrations/starfish.svg" class="shop-decor shop-decor-star" alt="" aria-hidden="true">
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-14 relative">
+        <nav class="flex items-center gap-1.5 text-xs font-semibold text-slate-500" aria-label="Breadcrumb">
+          <a href="#/" class="hover:text-sky-700 transition">Trang chủ</a>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+          <span id="shopCrumb" class="text-slate-800">Tất cả</span>
+        </nav>
+
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mt-3">
+          <div>
+            <h1 id="catalogTitle" class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900">Tất Cả Sản Phẩm</h1>
+            <p id="shopDesc" class="text-sm text-slate-600 mt-1.5 max-w-xl">Toàn bộ đồ bơi &amp; phụ kiện đang bán tại Soobin.</p>
+            <div class="sp-shop-ctas">
+              <button type="button" class="sp-cta sp-cta-trip" onclick="soobinPlus.openTripStylist()">
+                <i data-lucide="luggage" class="w-4 h-4"></i><span>Stylist chuyến đi</span>
+              </button>
+              <button type="button" class="sp-cta sp-cta-fit" onclick="soobinPlus.openFitProfile()">
+                <i data-lucide="ruler" class="w-4 h-4"></i><span id="spShopFitLabel">Hồ sơ size</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- VIP Loyalty Status Card -->
+          <div id="loyaltyStatusCard" class="w-full lg:w-80 rounded-2xl p-3.5 bg-white/85 backdrop-blur border border-white shadow-sm">
+            <div class="space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-sky-600" id="loyaltyTierBadge">👑 SOOBIN AQUATIC CLUB</span>
+                <span class="text-[11px] font-bold text-amber-600" id="loyaltyPointsText">Ưu đãi thành viên</span>
+              </div>
+              <p class="text-xs font-bold text-slate-800" id="loyaltyPerkText">Đăng nhập để tích điểm &amp; nhận đặc quyền thành viên</p>
+              <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                <div id="loyaltyProgressBar" class="bg-gradient-to-r from-sky-500 to-cyan-400 h-full rounded-full transition-all duration-700" style="width: 25%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <nav id="shopTabs" class="shop-tabs mt-6" aria-label="Danh mục sản phẩm">
+          <a href="#/shop/all" data-route="all" class="shop-tab category-pill-btn">Tất cả</a>
+          <a href="#/shop/do-boi-nu" data-route="do-boi-nu" class="shop-tab category-pill-btn">Đồ Bơi Nữ</a>
+          <a href="#/shop/do-boi-nam" data-route="do-boi-nam" class="shop-tab category-pill-btn">Đồ Bơi Nam</a>
+          <a href="#/shop/phu-kien-boi-loi" data-route="phu-kien-boi-loi" class="shop-tab category-pill-btn">Phụ Kiện</a>
+          <a href="#/shop/do-boi-tre-em" data-route="do-boi-tre-em" class="shop-tab category-pill-btn">Trẻ Em</a>
+          <a href="#/shop/sale" data-route="sale" class="shop-tab shop-tab-sale category-pill-btn">🔥 Đang giảm giá</a>
+        </nav>
+      </div>
+      <svg class="shop-hero-wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 30 Q 180 0 360 30 T 720 30 T 1080 30 T 1440 30 V60 H0Z" fill="#f8fafc"/>
+      </svg>
+    </section>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 flex-1 w-full space-y-5">
+      <!-- Controls Header -->
+      <div id="catalogGrid" class="shop-toolbar p-3.5 rounded-2xl border border-sky-100 bg-white shadow-sm space-y-3">
+        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span id="catalogCountBadge" class="px-2.5 py-1 text-xs font-extrabold rounded-full bg-sky-100 text-sky-700">Bộ Sưu Tập</span>
+            <div class="relative sm:hidden">
+              <input type="text" id="mobileSearchInput" placeholder="Tìm sản phẩm..." class="w-40 pl-7 pr-8 py-1.5 text-xs bg-sky-50 border border-sky-200 rounded-full outline-none focus:border-sky-600">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-sky-500 absolute left-2.5 top-2"></i>
+              <button type="button" class="sp-visual-btn" data-visual-search title="Tìm bằng hình ảnh" aria-label="Tìm bằng hình ảnh">
+                <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+            <div class="flex items-center bg-sky-50 p-1 rounded-xl border border-sky-200 text-xs font-bold">
+              <button onclick="setCatalogMorphLayout('grid')" id="layoutBtn-grid" class="quick-filter-btn px-2.5 py-1.5 rounded-lg bg-white text-sky-700 shadow-sm flex items-center gap-1 transition">
+                <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> Lưới
+              </button>
+              <button onclick="setCatalogMorphLayout('lookbook')" id="layoutBtn-lookbook" class="quick-filter-btn px-2.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 flex items-center gap-1 transition">
+                <i data-lucide="gallery-horizontal-end" class="w-3.5 h-3.5"></i> Chi Tiết
+              </button>
+              <button onclick="setCatalogMorphLayout('compact')" id="layoutBtn-compact" class="quick-filter-btn px-2.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 flex items-center gap-1 transition">
+                <i data-lucide="rows-3" class="w-3.5 h-3.5"></i> Gọn
+              </button>
+            </div>
+
+            <select id="audienceSelect" onchange="applyFilters()" class="text-xs bg-white text-slate-800 border border-sky-200 rounded-xl px-3 py-2 font-semibold focus:ring-2 focus:ring-sky-500 outline-none">
+              <option value="">Đối tượng: Tất cả</option>
+              <option value="Nữ">Nữ</option>
+              <option value="Nam">Nam</option>
+              <option value="Unisex">Unisex</option>
+            </select>
+
+            <div class="flex items-center gap-1">
+              <input id="minPriceInput" type="number" min="0" placeholder="Giá từ" onchange="applyFilters()" class="w-24 text-xs bg-white text-slate-800 border border-sky-200 rounded-xl px-2.5 py-2 font-medium focus:ring-2 focus:ring-sky-500 outline-none">
+              <span class="text-slate-400">–</span>
+              <input id="maxPriceInput" type="number" min="0" placeholder="Đến" onchange="applyFilters()" class="w-24 text-xs bg-white text-slate-800 border border-sky-200 rounded-xl px-2.5 py-2 font-medium focus:ring-2 focus:ring-sky-500 outline-none">
+            </div>
+
+            <select id="sortSelect" onchange="applyFilters()" class="text-xs bg-white text-slate-800 border border-sky-200 rounded-xl px-3 py-2 font-semibold focus:ring-2 focus:ring-sky-500 outline-none">
+              <option value="newest">Mới nhất</option>
+              <option value="price_asc">Giá thấp → cao</option>
+              <option value="price_desc">Giá cao → thấp</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-1.5 pt-2.5 border-t border-sky-100 text-xs">
+          <span class="text-[11px] font-bold text-slate-500 mr-1">Mức giá:</span>
+          <button type="button" onclick="applyQuickPriceRange('', '')" class="quick-filter-btn px-2.5 py-1 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-800 font-bold border border-sky-200 transition">Tất cả</button>
+          <button type="button" onclick="applyQuickPriceRange(0, 500000)" class="quick-filter-btn px-2.5 py-1 rounded-full bg-white hover:bg-sky-50 text-slate-700 font-semibold border border-slate-200 transition">Dưới 500.000đ</button>
+          <button type="button" onclick="applyQuickPriceRange(500000, 850000)" class="quick-filter-btn px-2.5 py-1 rounded-full bg-white hover:bg-sky-50 text-slate-700 font-semibold border border-slate-200 transition">500.000đ – 850.000đ</button>
+          <button type="button" onclick="applyQuickPriceRange(850000, '')" class="quick-filter-btn px-2.5 py-1 rounded-full bg-white hover:bg-sky-50 text-slate-700 font-semibold border border-slate-200 transition">Trên 850.000đ</button>
+        </div>
+      </div>
+
+      <!-- Product Grid -->
+      <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="col-span-full py-16 text-center text-slate-400">
+          <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-2 text-sky-500"></i>
+          Đang tải sản phẩm...
+        </div>
+      </div>
+      <nav id="productPagination" class="flex items-center justify-center gap-3 pt-6" aria-label="Phân trang sản phẩm"></nav>
+
+      <section class="shop-service-strip grid grid-cols-2 lg:grid-cols-4 gap-3 pt-6">
+        <div><i data-lucide="badge-check" class="w-5 h-5 text-sky-600"></i><span>Chính hãng 100%</span></div>
+        <div><i data-lucide="sun" class="w-5 h-5 text-amber-500"></i><span>Chống UV UPF 50+</span></div>
+        <div><i data-lucide="repeat" class="w-5 h-5 text-emerald-600"></i><span>Đổi size 15 ngày</span></div>
+        <div><i data-lucide="truck" class="w-5 h-5 text-sky-600"></i><span>Giao GHTK toàn quốc</span></div>
+      </section>
+    </main>
+  </div>
+
+
+  <!-- Shopping Cart Drawer (Slide Over) -->
+  <div id="cartDrawerBackdrop" onclick="toggleCartDrawer()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden transition-opacity"></div>
+  <aside id="cartDrawer" class="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white text-slate-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+    <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+      <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+        <i data-lucide="shopping-bag" class="w-5 h-5 text-sky-600"></i> Giỏ Hàng Của Bạn
+      </h3>
+      <button onclick="toggleCartDrawer()" class="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+    <div id="cartItemsList" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+    <div class="p-4 border-t border-slate-200 bg-slate-50 space-y-3">
+      <div class="flex items-center justify-between text-sm">
+        <span class="text-slate-500">Tạm tính tiền hàng:</span>
+        <span id="cartSubtotalText" class="font-bold text-base text-slate-900">0 đ</span>
+      </div>
+      <p class="text-xs text-slate-400">Phí vận chuyển và khuyến mãi tốt nhất sẽ được tính tại bước thanh toán.</p>
+      <button onclick="openCheckoutModal()" class="w-full py-3 bg-gradient-to-r from-sky-600 to-cyan-500 text-white font-bold rounded-xl shadow-lg hover:from-sky-700 hover:to-cyan-600 transition flex items-center justify-center gap-2">
+        <span>Tiến Hành Đặt Hàng</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Product Detail & 3D Studio Modal -->
+  <div id="productDetailModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-800 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl relative p-6 morph-transition">
+      <button onclick="closeProductModal()" class="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100 z-10">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div id="productModalContent"></div>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative p-6 space-y-5">
+      <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-600 rounded-full bg-slate-100">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div>
+        <h3 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+          <i data-lucide="shield-check" class="w-6 h-6 text-sky-600"></i> Thanh Toán Đơn Hàng
+        </h3>
+        <p class="text-xs text-slate-500">Vui lòng kiểm tra địa chỉ nhận hàng và phương thức thanh toán</p>
+      </div>
+
+      <!-- Shipping Information Form -->
+      <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+        <div class="flex items-center justify-between">
+          <h4 class="font-bold text-sm text-slate-800">1. Thông tin người nhận</h4>
+          <button type="button" onclick="openAddressBookModal()" class="text-xs font-bold text-sky-600 hover:underline flex items-center gap-1">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Quản lý sổ địa chỉ
+          </button>
+        </div>
+        <div id="savedAddressSelectorWrap">
+          <select id="savedAddressSelect" onchange="applySelectedAddress()" class="w-full text-xs px-3 py-2 border border-sky-200 bg-white rounded-lg font-medium text-slate-700 outline-none focus:ring-2 focus:ring-sky-500">
+            <option value="">-- Chọn nhanh từ sổ địa chỉ đã lưu --</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input type="text" id="orderRecipientName" placeholder="Họ và tên người nhận *" class="text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 outline-none">
+          <input type="text" id="orderRecipientPhone" placeholder="Số điện thoại người nhận *" class="text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 outline-none">
+        </div>
+        <input type="text" id="orderShippingAddress" placeholder="Địa chỉ chi tiết (Số nhà, đường, phường, quận, tỉnh) *" class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 outline-none">
+        <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer pt-1">
+          <input type="checkbox" id="saveAddressOnCheckout" class="rounded text-sky-600 focus:ring-sky-500">
+          <span>Lưu địa chỉ này vào sổ địa chỉ cá nhân để dùng cho lần sau</span>
+        </label>
+      </div>
+
+      <!-- Voucher Input & Calculation -->
+      <div class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+        <h4 class="font-bold text-sm text-slate-800">2. Mã giảm giá / Voucher</h4>
+        <div class="flex gap-2">
+          <input type="text" id="voucherCodeInput" placeholder="Nhập mã voucher (VD: SOOBIN15)" class="flex-1 text-sm uppercase px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 outline-none">
+          <button onclick="recalculateCheckoutDiscount()" class="px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-900 transition">
+            Áp Dụng
+          </button>
+        </div>
+        <div id="discountCalculationStatus" class="text-xs text-slate-600 mt-1"></div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+        <h4 class="font-bold text-sm text-slate-800">3. Phương thức thanh toán</h4>
+        <div class="grid grid-cols-2 gap-3">
+          <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-white transition bg-white border-sky-500">
+            <input type="radio" name="paymentMethod" value="COD" checked class="text-sky-600 focus:ring-sky-500">
+            <div>
+              <span class="text-sm font-bold block">COD</span>
+              <span class="text-[11px] text-slate-500">Trả tiền mặt khi nhận hàng</span>
+            </div>
+          </label>
+          <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-white transition bg-white">
+            <input type="radio" name="paymentMethod" value="VietQR" class="text-sky-600 focus:ring-sky-500">
+            <div>
+              <span class="text-sm font-bold block">VietQR</span>
+              <span class="text-[11px] text-slate-500">Quét mã chuyển khoản ngân hàng</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Price Breakdown -->
+      <div class="space-y-2 pt-2 text-sm border-t border-slate-200">
+        <div class="flex justify-between text-slate-600">
+          <span>Tiền hàng gốc:</span>
+          <span id="breakdownSubtotal" class="font-semibold">0 đ</span>
+        </div>
+        <div class="flex justify-between text-emerald-600">
+          <span id="breakdownDiscountLabel">Giảm giá:</span>
+          <span id="breakdownDiscountAmount" class="font-bold">-0 đ</span>
+        </div>
+        <div class="flex justify-between text-slate-600">
+          <span>Phí vận chuyển (GHTK):</span>
+          <span id="breakdownShippingFee" class="font-semibold">30,000 đ</span>
+        </div>
+        <div class="flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t">
+          <span>Tổng thanh toán:</span>
+          <span id="breakdownTotal" class="text-sky-600 text-lg">0 đ</span>
+        </div>
+      </div>
+
+      <!-- Submit Order Button -->
+      <button onclick="submitOrder()" class="w-full py-3.5 bg-gradient-to-r from-sky-600 to-cyan-500 text-white font-bold rounded-xl shadow-lg hover:from-sky-700 hover:to-cyan-600 transition flex items-center justify-center gap-2">
+        <i data-lucide="check-circle" class="w-5 h-5"></i>
+        <span>Xác Nhận Đặt Hàng Ngay</span>
+      </button>
+    </div>
+  </div>
+
+      <!-- Order Success, Thank You Customer Banner & VietQR Display Modal -->
+  <div id="orderSuccessModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-800 rounded-3xl max-w-lg w-full p-6 text-center space-y-4 shadow-2xl border-2 border-sky-200 max-h-[92vh] overflow-y-auto">
+      <div class="w-16 h-16 bg-emerald-100 border-2 border-emerald-400 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-sm">
+        <i data-lucide="party-popper" class="w-8 h-8"></i>
+      </div>
+      <div>
+        <span class="inline-block px-3 py-0.5 rounded-full bg-sky-100 text-sky-700 font-extrabold text-[11px] uppercase tracking-wider mb-1">
+          Đặt Hàng Thành Công
+        </span>
+        <h3 class="text-2xl font-black text-slate-900">Xin Cảm Ơn Quý Khách!</h3>
+        <p id="successThankYouCustomerMsg" class="text-xs text-slate-600 mt-1 leading-relaxed">
+          Cảm ơn quý khách đã tin tưởng lựa chọn đồ bơi & phụ kiện tại <strong>Soobin Swimwear</strong>. Chúc quý khách có những giờ phút bơi lội thật sảng khoái!
+        </p>
+      </div>
+      <div class="bg-sky-50 border border-sky-200 rounded-xl p-3 flex items-center justify-between text-xs">
+        <span class="text-slate-600 font-semibold">Mã đơn hàng của bạn:</span>
+        <strong id="successOrderCode" class="text-sky-700 font-mono text-sm font-black"></strong>
+      </div>
+      <input type="hidden" id="successOrderId" value="">
+      <audio id="orderCelebrationAudio" src="/static/audio/order_celebration.wav" preload="auto"></audio>
+      <audio id="waterSelectAudio" src="/static/audio/water_select.wav" preload="auto"></audio>
+
+      <div id="vietqrBox" class="hidden bg-slate-50 border border-sky-200 rounded-2xl p-4 text-left space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <h4 class="font-extrabold text-xs uppercase tracking-wider text-sky-800">Tài Khoản Ngân Hàng Nhận Chuyển Khoản</h4>
+          <span id="vietqrPaymentStatusBadge" class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px]">Chờ chuyển khoản</span>
+        </div>
+        <div class="flex flex-col sm:flex-row items-center gap-4">
+          <img id="vietqrImage" src="" alt="VietQR" class="w-40 h-40 border-2 border-sky-200 rounded-xl bg-white p-1.5 shadow-sm object-contain">
+          <div class="text-xs space-y-1.5 text-slate-700 flex-1">
+            <p>Ngân hàng: <strong id="vietqrBankName" class="text-slate-900">MBBank</strong></p>
+            <p>Số tài khoản: <strong id="vietqrAccountNo" class="text-sky-700 font-mono text-sm">0389998888</strong></p>
+            <p>Chủ tài khoản: <strong id="vietqrAccountName" class="text-slate-900">SOOBIN SWIMWEAR ATELIER</strong></p>
+            <p>Chi nhánh: <span id="vietqrBranch" class="text-slate-500">Chi nhánh TP. Hồ Chí Minh</span></p>
+            <p>Số tiền theo đơn: <strong id="vietqrAmount" class="text-rose-600 font-extrabold text-sm"></strong></p>
+            <p>Nội dung CK: <strong id="vietqrContent" class="text-rose-700 font-mono bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded"></strong></p>
+          </div>
+        </div>
+
+        <!-- Customer Confirmation & Auto-Webhook Verification Section -->
+        <div class="pt-2 border-t border-slate-200 space-y-2">
+          <label class="block text-[11px] font-bold text-slate-600">
+            Xác nhận sau khi bạn đã quét mã chuyển khoản:
+          </label>
+          <input type="text" id="vietqrTxnRefInput" placeholder="Nhập mã giao dịch ngân hàng (Tùy chọn, VD: FT26305...)" class="w-full text-xs px-3 py-1.5 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-sky-500">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button type="button" onclick="customerReportBankTransfer(false)" class="py-2 px-3 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm">
+              <span>📨 Báo Shop Đã Chuyển Khoản</span>
+            </button>
+            <button type="button" onclick="customerReportBankTransfer(true)" class="py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm">
+              <span>⚡ Ngân Hàng Báo Có Tự Động</span>
+            </button>
+          </div>
+          <p id="vietqrConfirmResultMsg" class="text-[11px] text-emerald-700 font-semibold hidden"></p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-2 pt-2">
+        <button onclick="openInvoiceFromSuccessModal()" class="flex-1 py-2.5 bg-sky-50 border border-sky-200 text-sky-700 text-xs font-extrabold rounded-xl hover:bg-sky-100 transition">
+          🧾 Xem Hóa Đơn & QR Đơn Này
+        </button>
+        <button onclick="closeSuccessModal(); viewMyOrders();" class="flex-1 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-xl hover:bg-slate-900 transition">
+          Đơn Hàng Của Tôi
+        </button>
+        <button onclick="closeSuccessModal()" class="py-2.5 px-3 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Orders Modal -->
+  <div id="ordersModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative p-6 space-y-4">
+      <button onclick="closeOrdersModal()" class="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-600 rounded-full bg-slate-100">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+        <i data-lucide="package" class="w-6 h-6 text-sky-600"></i> Lịch Sử Đơn Hàng & Hóa Đơn Điện Tử
+      </h3>
+      <div id="ordersListContainer" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- Wishlist Modal -->
+  <div id="wishlistModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-800 rounded-2xl max-w-3xl w-full max-h-[88vh] overflow-y-auto shadow-2xl relative p-6 space-y-4">
+      <button onclick="closeWishlistModal()" class="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-600 rounded-full bg-slate-100">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="flex flex-wrap items-center justify-between gap-2 pr-8">
+        <div>
+          <h3 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+            <i data-lucide="heart" class="w-6 h-6 text-rose-500"></i> Danh Sách Sản Phẩm Yêu Thích
+          </h3>
+        </div>
+        <button onclick="checkWishlistDiscounts()" class="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+          <i data-lucide="bell-ring" class="w-3.5 h-3.5"></i> Kiểm tra ưu đãi giảm giá
+        </button>
+      </div>
+      <div id="wishlistItemsContainer" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- Address Book Modal -->
+  <div id="addressBookModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-800 rounded-2xl max-w-2xl w-full max-h-[88vh] overflow-y-auto shadow-2xl relative p-6 space-y-4">
+      <button onclick="closeAddressBookModal()" class="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-600 rounded-full bg-slate-100">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div>
+        <h3 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+          <i data-lucide="map-pin" class="w-6 h-6 text-sky-600"></i> Sổ Địa Chỉ Nhận Hàng
+        </h3>
+      </div>
+      <form onsubmit="handleAddAddress(event)" class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+        <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-700">+ Thêm địa chỉ mới</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input type="text" id="addrRecipientName" required placeholder="Họ tên người nhận *" class="text-xs px-3 py-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-sky-500">
+          <input type="text" id="addrRecipientPhone" required placeholder="Số điện thoại *" class="text-xs px-3 py-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-sky-500">
+        </div>
+        <input type="text" id="addrLine" required placeholder="Địa chỉ chi tiết (Số nhà, đường, phường/xã, quận/huyện, tỉnh/TP) *" class="w-full text-xs px-3 py-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-sky-500">
+        <div class="flex items-center justify-between">
+          <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
+            <input type="checkbox" id="addrIsDefault" checked class="rounded text-sky-600"> Đặt làm địa chỉ mặc định
+          </label>
+          <button type="submit" class="px-4 py-2 bg-sky-600 text-white text-xs font-bold rounded-lg hover:bg-sky-700 transition">Lưu Địa Chỉ</button>
+        </div>
+      </form>
+      <div id="addressBookList" class="space-y-2.5"></div>
+    </div>
+  </div>
+
+  <!-- Printable Invoice Detail Modal -->
+  <div id="invoiceModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-800 rounded-2xl max-w-3xl w-full max-h-[92vh] overflow-y-auto shadow-2xl relative p-6 space-y-5">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+          <i data-lucide="file-text" class="w-5 h-5 text-sky-600"></i> Hóa Đơn Bán Hàng Điện Tử
+        </h3>
+        <div class="flex items-center gap-2">
+          <button onclick="printInvoiceContent()" class="px-3.5 py-1.5 bg-sky-600 text-white text-xs font-bold rounded-lg hover:bg-sky-700 transition flex items-center gap-1.5">
+            <i data-lucide="printer" class="w-3.5 h-3.5"></i> In Hóa Đơn
+          </button>
+          <button onclick="closeInvoiceModal()" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-full bg-slate-100">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+      <div id="invoicePrintableArea" class="space-y-4 text-xs text-slate-700"></div>
+    </div>
+  </div>
+
+  <!-- Product Review Modal -->
+  <div id="reviewModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-800 rounded-2xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
+      <button onclick="closeReviewModal()" class="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-600 rounded-full bg-slate-100">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div>
+        <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+          <i data-lucide="star" class="w-5 h-5 text-amber-500"></i> Đánh Giá Sản Phẩm
+        </h3>
+        <p id="reviewModalProductName" class="text-xs font-semibold text-sky-600 mt-0.5"></p>
+      </div>
+      <form onsubmit="submitProductReviewForm(event)" class="space-y-3">
+        <input type="hidden" id="reviewOrderId">
+        <input type="hidden" id="reviewProductId">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Mức độ hài lòng (Số sao):</label>
+          <select id="reviewRating" class="w-full text-sm px-3 py-2 border rounded-xl bg-amber-50/50 font-bold text-amber-700 outline-none focus:ring-2 focus:ring-amber-400">
+            <option value="5">⭐⭐⭐⭐⭐ (5/5 - Tuyệt vời)</option>
+            <option value="4">⭐⭐⭐⭐ (4/5 - Hài lòng)</option>
+            <option value="3">⭐⭐⭐ (3/5 - Bình thường)</option>
+            <option value="2">⭐⭐ (2/5 - Tạm được)</option>
+            <option value="1">⭐ (1/5 - Không hài lòng)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nhận xét chi tiết của bạn *</label>
+          <textarea id="reviewContent" rows="3" required minlength="3" placeholder="Chia sẻ cảm nhận về chất vải, độ co giãn, form dáng khi mặc..." class="w-full text-xs px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500"></textarea>
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl shadow hover:from-amber-600 hover:to-orange-600 transition">
+          Gửi Đánh Giá
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Stylist Concierge & Customer Feedback Modal -->
+  <div id="stylistModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-800 rounded-2xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
+      <button onclick="closeStylistModal()" class="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-600 rounded-full bg-slate-100">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div>
+        <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+          <i data-lucide="message-circle-heart" class="w-5 h-5 text-sky-600"></i> Tư Vấn Phối Đồ & Hỗ Trợ Khách Hàng
+        </h3>
+      </div>
+      <form onsubmit="submitStylistFeedback(event)" class="space-y-3 text-xs">
+        <input type="text" id="fbSenderName" required placeholder="Họ và tên của bạn *" class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500">
+        <input type="email" id="fbSenderEmail" required placeholder="Email hoặc SĐT liên hệ *" class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500">
+        <textarea id="fbMessage" rows="3" required minlength="5" placeholder="Mô tả nhu cầu của bạn (VD: Cần tư vấn set bikini đi Phú Quốc cho chiều cao 1m63, 51kg)..." class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500"></textarea>
+        <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-sky-600 to-cyan-500 text-white font-extrabold rounded-xl shadow">
+          Gửi Yêu Cầu Tư Vấn
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Product Comparison Matrix Modal -->
+  <div id="compareModal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-800 rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative p-6 space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div>
+          <h3 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+            <i data-lucide="columns-3" class="w-6 h-6 text-sky-600"></i> Bảng So Sánh Sản Phẩm
+          </h3>
+        </div>
+        <button onclick="closeCompareModal()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div id="compareModalContent" class="overflow-x-auto"></div>
+    </div>
+  </div>
+
+  <!-- Size Exchange / Warranty Support Modal -->
+  <div id="exchangeRequestModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-800 rounded-2xl max-w-lg w-full p-6 relative shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+      <button onclick="closeExchangeModal()" class="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-600 rounded-full bg-slate-100">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div>
+        <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+          <i data-lucide="repeat" class="w-5 h-5 text-sky-600"></i> Yêu Cầu Đổi Size / Bảo Hành / Trả Hàng
+        </h3>
+        <p id="exchangeModalOrderLabel" class="text-xs font-bold text-sky-600 mt-0.5"></p>
+      </div>
+
+      <div class="bg-sky-50/80 border border-sky-200 rounded-xl p-3.5 space-y-2 text-[11px] text-slate-700">
+        <div class="font-extrabold text-sky-900 uppercase tracking-wider">
+          <span>⏱️ Thời hạn Chính sách Hậu mãi</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center pt-1">
+          <div class="bg-white p-2 rounded-lg border border-sky-100">
+            <span class="text-[10px] text-slate-400 block">Đổi Size / Mẫu</span>
+            <strong id="policyExchangeDaysLabel" class="text-sky-700 font-extrabold text-xs">15 ngày</strong>
+          </div>
+          <div class="bg-white p-2 rounded-lg border border-sky-100">
+            <span class="text-[10px] text-slate-400 block">Trả Hàng / Hoàn Tiền</span>
+            <strong id="policyReturnDaysLabel" class="text-rose-600 font-extrabold text-xs">7 ngày</strong>
+          </div>
+          <div class="bg-white p-2 rounded-lg border border-sky-100">
+            <span class="text-[10px] text-slate-400 block">Bảo Hành Sản Phẩm</span>
+            <strong id="policyWarrantyDaysLabel" class="text-emerald-700 font-extrabold text-xs">90 ngày</strong>
+          </div>
+        </div>
+        <p id="policyTermsText" class="text-[11px] text-slate-600 italic pt-1 border-t border-sky-100">
+          Đổi size miễn phí khi còn nguyên tem mác; Bảo hành miễn phí đường chỉ, khóa kéo và phụ kiện kim loại chống muối biển.
+        </p>
+      </div>
+
+      <form onsubmit="submitExchangeRequestForm(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="exchangeOrderId">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Hình thức hỗ trợ mong muốn:</label>
+          <select id="exchangeResolution" class="w-full px-3 py-2 border rounded-xl bg-slate-50 font-semibold outline-none focus:ring-2 focus:ring-sky-500">
+            <option value="EXCHANGE_SIZE">🔄 Đổi sang Size khác vừa vặn hơn</option>
+            <option value="WARRANTY_REPAIR">🛡️ Bảo hành đường may / khóa kéo / phụ kiện đồ bơi</option>
+            <option value="RETURN_REFUND">💸 Trả hàng & Yêu cầu hoàn tiền trong hạn quy định</option>
+            <option value="REFUND_CONSULT">💬 Nhờ chuyên viên CSKH liên hệ tư vấn đổi mẫu</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Size mong muốn đổi sang (Nếu đổi size):</label>
+          <select id="exchangeTargetSize" class="w-full px-3 py-2 border rounded-xl bg-white font-bold text-sky-700 outline-none focus:ring-2 focus:ring-sky-500">
+            <option value="S">Size S</option>
+            <option value="M">Size M</option>
+            <option value="L" selected>Size L</option>
+            <option value="XL">Size XL</option>
+            <option value="2XL">Size 2XL</option>
+            <option value="Giữ nguyên size">Giữ nguyên size (Bảo hành / Trả hàng)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Lý do chi tiết / Tình trạng sản phẩm *</label>
+          <textarea id="exchangeReason" rows="3" required minlength="3" placeholder="VD: Mình mặc size M hơi ôm phần vai, muốn đổi lên size L..." class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500"></textarea>
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-sky-600 to-cyan-500 text-white font-extrabold rounded-xl shadow">
+          Gửi Yêu Cầu Hỗ Trợ
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Floating Compare Bar -->
+  <div id="compareFloatingBar" class="fixed bottom-5 right-20 z-40 hidden bg-slate-900/95 backdrop-blur-md text-white border border-cyan-500/40 px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-3">
+    <div class="flex items-center gap-2 text-xs font-bold">
+      <span class="w-6 h-6 rounded-full bg-cyan-500 text-slate-950 font-black flex items-center justify-center text-[11px]" id="compareCountBadge">0</span>
+      <span>Mẫu đang chọn so sánh</span>
+    </div>
+    <button onclick="openCompareModal()" class="px-3 py-1.5 bg-gradient-to-r from-sky-500 to-cyan-400 text-slate-950 font-extrabold text-xs rounded-xl hover:brightness-110 transition">
+      Mở Bảng So Sánh
+    </button>
+    <button onclick="clearCompareSelection()" class="text-slate-400 hover:text-rose-400 text-xs font-bold px-1" title="Xóa danh sách so sánh">✕</button>
+  </div>
+
+  <!-- Floating Swimwear & Size Advisor Widget -->
+  <div id="sizeAdvisorDock" class="fixed bottom-5 left-5 z-40">
+    <button onclick="toggleAIChatbox()" aria-label="Tư vấn size" title="Tư vấn size" class="soobin-fab group flex items-center gap-2 h-12 pl-3.5 pr-3.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs shadow-xl shadow-sky-600/30 transition-all">
+      <i data-lucide="ruler" class="w-5 h-5 shrink-0"></i>
+      <span class="fab-label">Tư vấn size</span>
+      <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-200 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-cyan-300 ring-2 ring-white"></span>
+      </span>
+    </button>
+
+    <div id="aiChatPanel" class="hidden mt-3 w-80 sm:w-96 bg-white text-slate-800 rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[540px]">
+      <div class="bg-gradient-to-r from-slate-900 via-sky-800 to-cyan-600 p-3.5 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center">
+            <i data-lucide="bot" class="w-5 h-5 text-cyan-200"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-extrabold">Trợ Lý Soobin Swimwear</h4>
+            <span class="text-[10px] text-cyan-200 block">Tư vấn chọn size & Gợi ý sản phẩm 24/7</span>
+          </div>
+        </div>
+        <button onclick="toggleAIChatbox()" class="p-1 text-white/80 hover:text-white rounded-lg hover:bg-white/10">
+          <i data-lucide="minimize-2" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="bg-sky-50/80 border-b border-sky-100 p-2.5 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-sky-900 flex items-center gap-1">
+            <i data-lucide="ruler" class="w-3.5 h-3.5 text-sky-600"></i> Nhập số đo để tính size:
+          </span>
+          <select id="aiGender" class="text-[11px] border border-sky-200 rounded px-1.5 py-0.5 bg-white font-semibold text-slate-700">
+            <option value="Nữ">Nữ</option>
+            <option value="Nam">Nam</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-3 gap-1.5">
+          <input type="number" id="aiHeight" placeholder="Cao (cm)" class="text-[11px] px-2 py-1 border rounded bg-white outline-none focus:border-sky-500">
+          <input type="number" id="aiWeight" placeholder="Nặng (kg)" class="text-[11px] px-2 py-1 border rounded bg-white outline-none focus:border-sky-500">
+          <input type="number" id="aiBust" placeholder="Ngực (cm)" class="text-[11px] px-2 py-1 border rounded bg-white outline-none focus:border-sky-500">
+        </div>
+        <div class="flex flex-wrap gap-1 pt-0.5">
+          <button type="button" onclick="sendQuickAIPrompt('Tư vấn size cho mình theo số đo trên')" class="px-2 py-0.5 bg-sky-600 text-white rounded-full text-[10px] font-bold hover:bg-sky-700">Tính Size Ngay</button>
+          <button type="button" onclick="sendQuickAIPrompt('Gợi ý đồ bơi nữ tôn dáng đi biển')" class="px-2 py-0.5 bg-white border border-sky-200 text-sky-700 rounded-full text-[10px] font-semibold hover:bg-sky-100">Đồ bơi nữ</button>
+          <button type="button" onclick="sendQuickAIPrompt('Gợi ý quần bơi nam thể thao')" class="px-2 py-0.5 bg-white border border-sky-200 text-sky-700 rounded-full text-[10px] font-semibold hover:bg-sky-100">Đồ bơi nam</button>
+          <button type="button" onclick="sendQuickAIPrompt('Sản phẩm nào đang giảm giá Outlet?')" class="px-2 py-0.5 bg-rose-50 border border-rose-200 text-rose-600 rounded-full text-[10px] font-semibold hover:bg-rose-100">Đang Sale</button>
+        </div>
+        <div class="sp-advisor-actions">
+          <button type="button" onclick="soobinPlus.openFitProfile({ fromAdvisor: true })">
+            <i data-lucide="user-round-check" class="w-3.5 h-3.5"></i><span id="spAdvisorFitLabel">Lưu hồ sơ size</span>
+          </button>
+          <button type="button" onclick="soobinPlus.openTripStylist()">
+            <i data-lucide="luggage" class="w-3.5 h-3.5"></i><span>Stylist chuyến đi</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="aiChatMessages" class="flex-1 overflow-y-auto p-3 space-y-2.5 text-xs bg-slate-50/50 max-h-64 min-h-[200px]">
+        <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-2.5 text-slate-700 shadow-sm">
+          👋 Xin chào! Mình là <strong>Chuyên viên tư vấn Soobin Swimwear</strong>. Bạn có thể nhập <em>chiều cao, cân nặng, số đo</em> ở trên hoặc nhắn tin (VD: <em>"Mình cao 1m62 nặng 50kg mặc size gì?"</em>) để mình tư vấn size chuẩn và gợi ý mẫu phù hợp nhé!
+        </div>
+      </div>
+
+      <form onsubmit="handleAIChatSubmit(event)" class="p-2.5 bg-white border-t border-slate-200 flex gap-2">
+        <input type="text" id="aiChatInput" placeholder="Nhập câu hỏi (VD: nữ 1m60 49kg mặc size gì)..." class="flex-1 text-xs px-3 py-2 bg-slate-100 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-sky-500">
+        <button type="submit" class="px-3 py-2 bg-sky-600 text-white rounded-xl hover:bg-sky-700 transition">
+          <i data-lucide="send" class="w-4 h-4"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl text-sm flex items-center gap-2 transition transform translate-y-2">
+    <i data-lucide="info" class="w-4 h-4 text-sky-400"></i>
+    <span id="toastMessage">Thông báo</span>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-wave" aria-hidden="true">
+    <svg viewBox="0 0 1440 90" preserveAspectRatio="none">
+      <path d="M0 50 Q 120 20 240 50 T 480 50 T 720 50 T 960 50 T 1200 50 T 1440 50 V90 H0Z" fill="#0c4a6e" opacity="0.35"/>
+      <path d="M0 62 Q 180 34 360 62 T 720 62 T 1080 62 T 1440 62 V90 H0Z" fill="#020617"/>
+    </svg>
+    <img src="/static/images/illustrations/surfboard.svg" class="footer-surf" alt="">
+  </div>
+  <footer class="bg-slate-950 text-slate-400 py-10 border-t border-slate-900 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div class="space-y-3">
+        <h4 class="text-white font-bold text-base flex items-center gap-2">
+          <i data-lucide="waves" class="w-5 h-5 text-cyan-400"></i> SOOBIN SWIMWEAR
+        </h4>
+        <p>Thương hiệu đồ bơi thi đấu, thời trang biển & phụ kiện bơi lội chuyên nghiệp chuẩn chất lượng quốc tế.</p>
+      </div>
+      <div class="space-y-2">
+        <h4 class="text-white font-bold">Chủ Đề Giao Diện</h4>
+        <div class="flex flex-wrap gap-1.5 pt-1">
+          <button onclick="switchStoreTheme('ocean-luxury')" class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-slate-800">Ocean Pearl</button>
+          <button onclick="switchStoreTheme('sunset-ibiza')" class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-800">Ibiza Sunset</button>
+          <button onclick="switchStoreTheme('midnight-vogue')" class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-purple-300 border border-slate-800">Deep Ocean</button>
+          <button onclick="switchStoreTheme('minimal-atelier')" class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-stone-300 border border-slate-800">Minimal Sand</button>
+        </div>
+      </div>
+      <div class="space-y-2">
+        <h4 class="text-white font-bold">Dịch Vụ Khách Hàng</h4>
+        <p>Vận chuyển GHTK đồng giá 30.000đ</p>
+        <p>Thanh toán COD & VietQR 24/7</p>
+        <p>Hỗ trợ đổi size & bảo hành chu đáo</p>
+      </div>
+      <div class="space-y-2">
+        <h4 class="text-white font-bold">Tiện Ích Mua Sắm</h4>
+        <p><a href="#/shop/sale" class="hover:text-white">Săn Ưu Đãi & Flash Sale</a></p>
+        <p><a href="javascript:void(0)" onclick="toggleAIChatbox(true)" class="hover:text-white">Tư Vấn Chọn Size Chuẩn</a></p>
+        <p><a href="javascript:void(0)" onclick="openStylistModal()" class="hover:text-white">Tư Vấn Phối Đồ Biển</a></p>
+        <p><a href="/login" class="hover:text-white">Tài Khoản Khách Hàng</a></p>
+      </div>
+    </div>
+    <div class="text-center text-slate-600 border-t border-slate-900 mt-8 pt-4">
+      © 2026 Soobin Aquatic & Pro Swimwear. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="/static/vendor/lenis.min.js"></script>
+  <script src="/static/vendor/gsap.min.js"></script>
+  <script src="/static/vendor/ScrollTrigger.min.js"></script>
+  <script src="/static/vendor/Flip.min.js"></script>
+  <script src="/static/vendor/split-type.min.js"></script>
+  <script src="/static/js/three.min.js"></script>
+  <script src="/static/js/app.js?v=ocean_v4"></script>
+  <script src="/static/js/creative-engine.js?v=ocean_v4"></script>
+  <script src="/static/js/ocean-stage.js?v=ocean_v4"></script>
+  <script src="/static/js/storefront-motion.js?v=ocean_v6"></script>
+  <script src="/static/js/lucky-wheel-core.js?v=wheel_v2"></script>
+  <script src="/static/js/lucky-wheel.js?v=wheel_v4"></script>
+  <script src="/static/js/water-cursor.js?v=wheel_v2"></script>
+  <script src="/static/js/storefront-plus.js?v=plus_v1"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

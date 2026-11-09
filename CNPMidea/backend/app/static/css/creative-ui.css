@@ -1,0 +1,159 @@
+/* ==========================================================================
+   SOOBIN SWIMWEAR — COOL AQUA BREEZE THEME & SOOTHING MICRO-INTERACTIONS
+   (Theo chuẩn antigravityrules.md: Lenis + GSAP Smooth & Eye-Friendly UI)
+   ========================================================================== */
+
+:root {
+  --aqua-bg: #f0f9ff;
+  --aqua-bg-soft: #e0f2fe;
+  --aqua-surface: #ffffff;
+  --aqua-border: #bae6fd;
+  --aqua-primary: #0284c7;
+  --aqua-primary-hover: #0369a1;
+  --aqua-teal: #0d9488;
+  --aqua-text: #0c4a6e;
+  --aqua-muted: #475569;
+}
+
+/* 1. COOL REFRESHING WEBSITE BACKGROUND (SOOTHING & EYE-FRIENDLY) */
+body,
+.aquatic-role-body {
+  background-color: #f0f9ff !important;
+  color: #0f172a;
+  scroll-behavior: smooth;
+}
+
+.aquatic-ocean-header {
+  background-color: #0c4a6e !important;
+  border-bottom: 1px solid #075985 !important;
+  box-shadow: 0 4px 16px rgba(12, 74, 110, 0.12);
+}
+
+/* Disable any legacy intro, curtain overlays, or top wave hero canvas */
+#soobinCinematicIntro,
+#soobinTransitionCurtain,
+#heroStageSection,
+#heroThreeAtmosphereCanvas {
+  display: none !important;
+}
+
+.aurora-backdrop::before,
+.magic-border-beam::after {
+  display: none !important;
+}
+
+/* 2. SOOTHING PRODUCT CARD & INTERACTIVE ELEMENT EFFECTS */
+.cool-product-card,
+.aceternity-3d-card {
+  background: #ffffff;
+  border: 1px solid #e0f2fe;
+  border-radius: 1rem;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.28s ease;
+}
+
+.cool-product-card:hover,
+.aceternity-3d-card:hover {
+  transform: translateY(-3px);
+  border-color: #7dd3fc;
+  box-shadow: 0 14px 28px -8px rgba(2, 132, 199, 0.14),
+              0 4px 10px -3px rgba(14, 165, 233, 0.08);
+}
+
+/* Subtle soothing water-ripple feedback on product selection */
+.soobin-water-ripple {
+  position: fixed;
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  margin-top: -12px;
+  border-radius: 9999px;
+  background: rgba(14, 165, 233, 0.22);
+  border: 1.5px solid rgba(2, 132, 199, 0.48);
+  pointer-events: none;
+  z-index: 9995;
+  animation: soobinRippleExpand 0.52s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes soobinRippleExpand {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
+/* 3. TOP SCROLL PROGRESS BAR (COOL CYAN) */
+#soobinScrollProgressBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #0ea5e9;
+  transform-origin: 0% 50%;
+  transform: scaleX(0);
+  z-index: 9998;
+  pointer-events: none;
+}
+
+/* 4. SONNER TOAST NOTIFICATIONS (CLEAN COOL AQUA STYLE) */
+#soobinSonnerToaster {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 24rem;
+  width: calc(100vw - 2.5rem);
+  pointer-events: none;
+}
+
+.sonner-toast-card {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.9rem;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1.5px solid #bae6fd;
+  box-shadow: 0 12px 28px -6px rgba(12, 74, 110, 0.16);
+}
+
+/* 5. ORDER CELEBRATION THANK-YOU MODAL */
+#thankYouCelebrationModal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(12, 74, 110, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+#thankYouCelebrationModal.hidden {
+  display: none !important;
+}
+
+.thank-you-modal-card {
+  background: #ffffff;
+  border: 2px solid #7dd3fc;
+  border-radius: 1.5rem;
+  max-width: 32rem;
+  width: 100%;
+  padding: 2rem;
+  box-shadow: 0 24px 48px -12px rgba(12, 74, 110, 0.25);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}

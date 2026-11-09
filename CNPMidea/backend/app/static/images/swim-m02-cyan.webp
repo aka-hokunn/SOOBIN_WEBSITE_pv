@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="750" viewBox="0 0 600 750">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e7490"/>
+      <stop offset="100%" stop-color="#0891b2"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <rect width="600" height="750" fill="url(#bg)"/>
+  
+  <!-- Wave pattern -->
+  <path d="M 0,550 Q 150,520 300,550 T 600,550 L 600,750 L 0,750 Z" fill="rgba(255,255,255,0.08)"/>
+  <path d="M 0,600 Q 150,570 300,600 T 600,600 L 600,750 L 0,750 Z" fill="rgba(255,255,255,0.12)"/>
+
+  <!-- Center Badge / Emblem -->
+  <g transform="translate(300, 320)" filter="url(#shadow)">
+    <circle cx="0" cy="0" r="110" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+    <path d="M -50,-20 C -25,-40 25,-40 50,-20 C 60,10 40,50 0,65 C -40,50 -60,10 -50,-20 Z" fill="#67e8f9" opacity="0.95"/>
+    <circle cx="0" cy="-2" r="12" fill="#ffffff" opacity="0.9"/>
+  </g>
+
+  <!-- Typography -->
+  <text x="300" y="490" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="24" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="1">
+    BOXER SÓNG BIỂN
+  </text>
+  <text x="300" y="525" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="14" font-weight="600" fill="rgba(255,255,255,0.8)" text-anchor="middle" letter-spacing="2">
+    BOXER NAM ĐI BIỂN
+  </text>
+  <text x="300" y="700" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="12" font-weight="700" fill="rgba(255,255,255,0.5)" text-anchor="middle" letter-spacing="3">
+    SOOBIN SWIMWEAR • PREMIUM FABRIC
+  </text>
+</svg>

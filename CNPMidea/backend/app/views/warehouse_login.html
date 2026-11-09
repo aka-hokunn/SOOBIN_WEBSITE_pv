@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cổng Đăng Nhập Thủ Kho (WAREHOUSE) - Soobin Swimwear</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-gradient-to-br from-amber-950 via-slate-900 to-stone-950 text-slate-100 min-h-screen flex flex-col justify-between relative overflow-hidden">
+
+  <!-- Background decorative glow -->
+  <div class="absolute -top-40 -left-40 w-96 h-96 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- Header -->
+  <header class="py-6 px-4 sm:px-8 flex items-center justify-between max-w-7xl mx-auto w-full relative z-10">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-400 flex items-center justify-center text-slate-950 shadow-lg shadow-amber-500/30 font-bold">
+        <i data-lucide="boxes" class="w-6 h-6 text-slate-900"></i>
+      </div>
+      <div>
+        <span class="text-xl font-extrabold tracking-tight text-white">SOOBIN <span class="text-amber-400">WAREHOUSE</span></span>
+        <span class="text-[10px] block text-amber-300 -mt-1 tracking-wider uppercase font-semibold">Cổng Quản Trị Tồn Kho & Phiếu Nhập Hàng</span>
+      </div>
+    </div>
+    <a href="/" class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1 transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> Storefront
+    </a>
+  </header>
+
+  <!-- Login Container -->
+  <main class="flex-1 flex items-center justify-center px-4 py-8 relative z-10">
+    <div class="bg-slate-900/90 backdrop-blur-2xl border border-amber-500/30 rounded-3xl shadow-2xl shadow-amber-950/50 p-8 sm:p-10 w-full max-w-md space-y-6">
+      
+      <!-- Title & Icon -->
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 bg-amber-950/80 border border-amber-500/40 text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-2 shadow-inner">
+          <i data-lucide="package-check" class="w-7 h-7"></i>
+        </div>
+        <div class="inline-block px-3 py-1 bg-amber-500/20 text-amber-300 text-[11px] font-extrabold rounded-full uppercase tracking-wider border border-amber-500/30">
+          Dành Cho Bộ Phận Kho Vận
+        </div>
+        <h1 class="text-2xl font-extrabold text-white tracking-tight">Cổng Quản Trị Thủ Kho</h1>
+        <p class="text-xs text-slate-400">Quản lý phiếu nhập kho nhà cung cấp, giá vốn bình quân và cảnh báo tồn</p>
+      </div>
+
+      <!-- Strict Internal Policy Notice -->
+      <div class="p-3 bg-amber-950/60 border border-amber-500/30 rounded-2xl flex items-start gap-2.5 text-[11px] text-amber-200">
+        <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
+        <div>
+          <strong class="font-bold text-white">Cổng Phân Quyền Nội Bộ:</strong> Không hỗ trợ đăng ký tự do. Chỉ người dùng (khách hàng) mới được đăng ký tại <a href="/login" class="underline text-amber-300 font-bold hover:text-white">Cổng Khách Hàng</a>.
+        </div>
+      </div>
+
+      <!-- Alert Box -->
+      <div id="loginAlert" class="hidden p-3.5 rounded-xl text-xs font-semibold border"></div>
+
+      <!-- Form -->
+      <form id="warehouseLoginForm" onsubmit="handleWarehouseLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1.5">Tài khoản Thủ Kho (Email)</label>
+          <div class="relative">
+            <i data-lucide="user" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3"></i>
+            <input type="text" id="warehouseEmail" required value="warehouse@soobin.vn"
+              class="w-full pl-10 pr-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
+              placeholder="warehouse@soobin.vn">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1.5">Mật khẩu</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3"></i>
+            <input type="password" id="warehousePassword" required value="Password123@"
+              class="w-full pl-10 pr-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-xs text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
+              placeholder="••••••••">
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn"
+          class="w-full py-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-500/30 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+          <span>Đăng Nhập Thủ Kho</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 text-slate-950"></i>
+        </button>
+      </form>
+
+      <!-- Demo Info -->
+      <div class="bg-amber-950/40 border border-amber-500/20 rounded-2xl p-3.5 text-xs text-slate-400 space-y-1">
+        <span class="font-bold text-amber-300 flex items-center gap-1.5">
+          <i data-lucide="info" class="w-3.5 h-3.5"></i> Tài khoản Thủ kho mẫu:
+        </span>
+        <div class="flex items-center justify-between text-[11px] pt-1">
+          <code class="text-slate-200">warehouse@soobin.vn</code>
+          <button type="button" onclick="fillWarehouse()" class="text-amber-400 font-bold hover:underline">Điền tự động</button>
+        </div>
+      </div>
+
+      <!-- Links to other portals -->
+      <div class="border-t border-slate-800 pt-4 text-center space-y-2">
+        <span class="text-[11px] text-slate-500 block">Cổng đăng nhập theo vai trò khác:</span>
+        <div class="flex flex-wrap justify-center gap-2 text-[11px] font-bold">
+          <a href="/admin/login" class="px-2.5 py-1 bg-slate-800 text-purple-400 rounded-lg hover:bg-slate-700">Cổng Admin</a>
+          <a href="/manager/login" class="px-2.5 py-1 bg-slate-800 text-emerald-400 rounded-lg hover:bg-slate-700">Cổng Quản Lý</a>
+          <a href="/sales/login" class="px-2.5 py-1 bg-slate-800 text-sky-400 rounded-lg hover:bg-slate-700">Cổng Sales</a>
+          <a href="/login" class="px-2.5 py-1 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700">Cổng Khách Hàng</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="py-4 text-center text-xs text-slate-500 relative z-10">
+    Hệ Thống Phân Quyền Bảo Mật Đa Cổng Soobin Swimwear. © 2026
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    function fillWarehouse() {
+      document.getElementById('warehouseEmail').value = 'warehouse@soobin.vn';
+      document.getElementById('warehousePassword').value = 'Password123@';
+    }
+
+    async function handleWarehouseLogin(e) {
+      e.preventDefault();
+      const alertBox = document.getElementById('loginAlert');
+      const submitBtn = document.getElementById('submitBtn');
+      alertBox.classList.add('hidden');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span>Đang xác thực...</span>`;
+
+      const email_or_phone = document.getElementById('warehouseEmail').value.trim();
+      const password = document.getElementById('warehousePassword').value;
+
+      try {
+        const res = await fetch('/api/v1/auth/portal-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email_or_phone, password, portal: 'WAREHOUSE' })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          alertBox.className = "p-3.5 rounded-xl text-xs font-semibold bg-rose-950/80 text-rose-300 border border-rose-800 block";
+          alertBox.innerText = data.detail || "Đăng nhập thất bại.";
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<span>Đăng Nhập Thủ Kho</span><i data-lucide="arrow-right" class="w-4 h-4 text-slate-950"></i>`;
+          lucide.createIcons();
+          return;
+        }
+
+        localStorage.setItem('session_token', data.session_token);
+        localStorage.setItem('user_role', data.user.role_code);
+        localStorage.setItem('user_name', data.user.full_name);
+
+        alertBox.className = "p-3.5 rounded-xl text-xs font-semibold bg-amber-950/80 text-amber-300 border border-amber-800 block";
+        alertBox.innerText = `Xác thực thành công! Xin chào Thủ kho ${data.user.full_name}. Đang chuyển trang...`;
+
+        setTimeout(() => {
+          window.location.href = data.redirect_url || '/warehouse';
+        }, 800);
+
+      } catch (err) {
+        alertBox.className = "p-3.5 rounded-xl text-xs font-semibold bg-rose-950/80 text-rose-300 border border-rose-800 block";
+        alertBox.innerText = "Lỗi kết nối máy chủ.";
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>Đăng Nhập Thủ Kho</span><i data-lucide="arrow-right" class="w-4 h-4 text-slate-950"></i>`;
+        lucide.createIcons();
+      }
+    }
+  </script>
+</body>
+</html>

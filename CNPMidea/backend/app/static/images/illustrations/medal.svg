@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220">
+  <defs>
+    <radialGradient id="gold" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#fef3c7"/>
+      <stop offset="0.5" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#b45309"/>
+    </radialGradient>
+  </defs>
+  <path d="M60 8 L92 92 L70 100 L36 18Z" fill="#0ea5e9"/>
+  <path d="M140 8 L108 92 L130 100 L164 18Z" fill="#0369a1"/>
+  <path d="M60 8 L72 8 L98 84 L92 92Z" fill="#fff" opacity="0.5"/>
+  <circle cx="100" cy="140" r="62" fill="url(#gold)" stroke="#92400e" stroke-width="4"/>
+  <circle cx="100" cy="140" r="46" fill="none" stroke="#fef3c7" stroke-width="3" opacity="0.8"/>
+  <!-- wave + swimmer glyph -->
+  <path d="M68 152 q8 -8 16 0 t16 0 t16 0 t16 0" fill="none" stroke="#92400e" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="86" cy="130" r="7" fill="#92400e"/>
+  <path d="M96 140 C 98 120, 118 112, 132 124" fill="none" stroke="#92400e" stroke-width="6" stroke-linecap="round"/>
+  <path d="M70 108 a38 38 0 0 1 28 -12" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+</svg>
+

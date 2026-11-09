@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 170">
+  <defs>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#0369a1"/>
+    </linearGradient>
+    <linearGradient id="fadeX" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="0.18" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="0.82" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fadeY" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0.6" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <mask id="soften" maskUnits="userSpaceOnUse" x="0" y="0" width="320" height="170">
+      <rect width="320" height="170" fill="url(#fadeX)"/>
+    </mask>
+    <mask id="softenY" maskUnits="userSpaceOnUse" x="0" y="0" width="320" height="170">
+      <rect width="320" height="170" fill="url(#fadeY)"/>
+    </mask>
+  </defs>
+  <g mask="url(#softenY)"><g mask="url(#soften)">
+  <!-- submerged body -->
+  <ellipse cx="190" cy="118" rx="88" ry="13" fill="#0c4a6e" opacity="0.35"/>
+  <path d="M150 116 C 120 128, 96 132, 70 126" stroke="#f2c38f" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.5"/>
+  <!-- water -->
+  <path d="M0 108 Q 20 96 40 108 T 80 108 T 120 108 T 160 108 T 200 108 T 240 108 T 280 108 T 320 108 V170 H0Z" fill="url(#water)" opacity="0.92"/>
+  <path d="M0 120 Q 20 112 40 120 T 80 120 T 120 120 T 160 120 T 200 120 T 240 120 T 280 120 T 320 120" fill="none" stroke="#e0f2fe" stroke-width="2.5" opacity="0.7"/>
+  <path d="M10 142 Q 30 134 50 142 T 90 142 T 130 142" fill="none" stroke="#e0f2fe" stroke-width="2" opacity="0.4"/>
+  <path d="M190 148 Q 210 140 230 148 T 270 148 T 310 148" fill="none" stroke="#e0f2fe" stroke-width="2" opacity="0.4"/>
+  </g></g>
+  <!-- recovering arm -->
+  <path d="M138 104 C 136 54, 88 30, 50 68" stroke="#f2c38f" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="48" cy="72" r="7.5" fill="#f2c38f"/>
+  <!-- head with cap & goggles -->
+  <circle cx="108" cy="100" r="19" fill="#f2c38f"/>
+  <path d="M90 96 A19 19 0 0 1 126 92 L126 100 L90 102Z" fill="#ef4444"/>
+  <path d="M95 88 q8 -6 18 -5" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.7"/>
+  <rect x="86" y="98" width="17" height="7" rx="3.5" fill="#0c4a6e"/>
+  <path d="M103 101 L124 100" stroke="#0c4a6e" stroke-width="3"/>
+  <!-- splashes -->
+  <g fill="#ffffff">
+    <path d="M40 92 q-6 -10 2 -16 q4 8 -2 16z" opacity="0.95"/>
+    <path d="M58 90 q2 -12 10 -12 q-2 9 -10 12z" opacity="0.9"/>
+    <circle cx="30" cy="86" r="3"/><circle cx="66" cy="80" r="2.5"/><circle cx="50" cy="78" r="2"/>
+    <circle cx="84" cy="88" r="2.5"/><circle cx="130" cy="92" r="2"/>
+  </g>
+  <!-- kick splash -->
+  <g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round">
+    <path d="M262 100 q8 -14 18 -4"/><path d="M280 104 q6 -12 16 -6"/><path d="M252 106 q4 -8 10 -6"/>
+  </g>
+  <g fill="#fff"><circle cx="272" cy="86" r="2.5"/><circle cx="292" cy="90" r="2"/><circle cx="258" cy="92" r="2"/></g>
+</svg>
+
